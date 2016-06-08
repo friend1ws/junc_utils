@@ -10,6 +10,30 @@ parser.add_argument("--version", action = "version", version = "junc_utils-0.1.0
 subparsers = parser.add_subparsers()
 
 ##########
+filter = subparsers.add_parser("filter",
+                               help = "filter out variants outside specified conditions")
+
+filter.add_argument("junc_file", metavar = "genomonSV.result.txt", default = None, type = str,
+                    help = "the path to star junction file")
+
+filter.add_argument("output_path", metavar = "output.txt", default = None, type = str,
+                    help = "the path to the output file")
+
+filter.add_argument("--read_num_thres", type = int, default = 3,
+                    help = "remove splicing junctions whose supporting numbers are below this value (default: %(default)s)")
+                           
+filter.add_argument("--overhang_thres", type = int, default = 10,
+                    help = "remove splicing junctions whose overhang sizes are this value (default: %(default)s)")
+                           
+filter.add_argument("--keep_annotated", default = False, action = 'store_true',
+                    help = "do not remove annotated splicing junctions")
+
+filter.add_argument("--pooled_control_file", default = None, type = str,
+                    help = "the path to control data created by merge_control (default: %(default)s)")
+
+filter.set_defaults(func = filter_main)
+
+##########
 
 # merge control
 merge_control = subparsers.add_parser("merge_control",
@@ -30,6 +54,9 @@ merge_control.add_argument("--overhang_thres", type = int, default = 10,
 
 merge_control.add_argument("--keep_annotated", default = False, action = 'store_true', 
                            help = "do not remove annotated splicing junctions")
+
+merge_control.add_argument("--sample_num_thres", type = int, default = 2,
+                           help = "register splicing junctions at least shared by specified number of samples (default: %(default)s)")
 
 merge_control.set_defaults(func = merge_control_main)
 

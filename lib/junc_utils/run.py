@@ -1,6 +1,13 @@
 #! /usr/bin/env python
 
 import os, subprocess
+import utils
+
+def filter_main(args):
+
+    utils.proc_star_junction(args.junc_file, args.output_path, args.pooled_control_file,
+                             args.read_num_thres, args.overhang_thres, not args.keep_annotated, False)
+
 
 
 def merge_control_main(args):
@@ -10,6 +17,7 @@ def merge_control_main(args):
     read_num_thres = args.read_num_thres
     overhang_thres = args.overhang_thres
     remove_annotated = False if args.keep_annotated else True
+    sample_num_thres = args.sample_num_thres
 
     # make directory for output if necessary
     if os.path.dirname(output_file) != "" and not os.path.exists(os.path.dirname(output_file)):
@@ -49,21 +57,22 @@ def merge_control_main(args):
     hout = open(output_file + ".merged", 'w')
     with open(output_file + ".sorted", 'r') as hin:
         temp_key = ""
-        temp_read_num = 0
+        temp_read_num = []
         for line in hin:
             F = line.rstrip('\n').split('\t')
             key = F[0] + '\t' + F[1] + '\t' + F[2]
             read_num = int(F[6])
             if key != temp_key:
                 if temp_key != "":
-                    print >> hout, temp_key + '\t' + str(read_num)
+                    if len(temp_read_num) >= sample_num_thres:
+                        print >> hout, temp_key + '\t' + ','.join(temp_read_num)
                 temp_key = key
-                temp_read_num = 0
+                temp_read_num = []
             else:
-                if read_num > temp_read_num:
-                    temp_read_num = read_num
+                temp_read_num.append(str(read_num))
 
-        print >> hout, temp_key + '\t' + str(read_num)
+        print >> hout, temp_key + '\t' + ','.join(temp_read_num)
+
 
 
     hout = open(output_file, 'w')
