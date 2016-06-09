@@ -1,6 +1,7 @@
 #! /usr/bin/env python
 
-import pysam, tabix
+import sys
+import pysam
 
 
 def proc_star_junction(input_file, output_file, control_file, read_num_thres, overhang_thres, remove_annotated, convert_map_splice2):
@@ -31,8 +32,8 @@ def proc_star_junction(input_file, output_file, control_file, read_num_thres, ov
                 try:
                     records = control_db.fetch(F[0], int(F[1]) - 5, int(F[1]) + 5)
                 except Exception as inst:
-                    print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
-                    tabixErrorMsg = str(inst.args)
+                    # print >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+                    # tabixErrorMsg = str(inst.args)
                     tabixErrorFlag = 1
 
                 control_flag = 0;

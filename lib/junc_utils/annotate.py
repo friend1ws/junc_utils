@@ -16,9 +16,10 @@ def spliced_coding_size(gene1, gene2, sj_chr, sj_start, sj_end, ref_coding_tb, e
         for record_line in records:
             record = record_line.split('\t')
             if record[3] in [gene1, gene2] and record[4] == "coding":
+
                 # sj_start overlaps with the current coding region
                 if int(record[1]) <= sj_start + exon_margin and sj_start - exon_margin <= int(record[2]):
-                    coding_size = coding_size + sj_start - int(record[2])
+                    coding_size = coding_size + int(record[2]) - sj_start
                 # sj_end overlaps with the current coding region
                 elif int(record[1]) <= sj_end + exon_margin and sj_end - exon_margin <= int(record[2]):
                     coding_size = coding_size + sj_end - 1 - int(record[1])
