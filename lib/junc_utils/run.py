@@ -2,12 +2,17 @@
 
 import os, subprocess
 import utils
+import annotate
 
 def filter_main(args):
 
     utils.proc_star_junction(args.junc_file, args.output_path, args.pooled_control_file,
                              args.read_num_thres, args.overhang_thres, not args.keep_annotated, False)
 
+
+def annotate_main(args):
+    
+    annotate.annot_junction(args.junc_file, args.output_path, args.annotation_dir, args.junction_margin, args.exon_margin)
 
 
 def merge_control_main(args):
