@@ -19,7 +19,11 @@ def spliced_coding_size(gene1, gene2, sj_chr, sj_start, sj_end, ref_coding_tb, e
 
                 # sj_start overlaps with the current coding region
                 if int(record[1]) <= sj_start + exon_margin and sj_start - exon_margin <= int(record[2]):
-                    coding_size = coding_size + int(record[2]) - sj_start
+                    # sj_end also overlaps with the current coding region
+                    if int(record[1]) <= sj_end + exon_margin and sj_end - exon_margin <= int(record[2]):
+                        coding_size = sj_end - sj_start - 1
+                    else:
+                        coding_size = coding_size + int(record[2]) - sj_start
                 # sj_end overlaps with the current coding region
                 elif int(record[1]) <= sj_end + exon_margin and sj_end - exon_margin <= int(record[2]):
                     coding_size = coding_size + sj_end - 1 - int(record[1])
@@ -202,6 +206,7 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
         # check for splice-site slip 
         if spliceClass == "":
             passGene = []
+            inframe_gene = []
             for gene in checkGenes:
                 if gene in gene1 and gene in gene2:
                     if (gene in junction1 and gene in exon2 and gene not in junction2) or (gene in junction2 and gene in exon1 and gene not in junction1):
@@ -227,9 +232,26 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
 
 
         ##########
+        # within-exon
+        if spliceClass == "":
+            passGene = []
+            inframe_gene = []
+            for gene in checkGenes:
+                if gene in gene1 and gene in gene2 and gene in exon1 and gene in exon2:
+                    if exon1[gene] == exon2[gene]:
+                        passGene.append(gene)
+
+                        if spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
+                            inframe_gene.append(gene)
+
+            if len(passGene) > 0: spliceClass = "within-exon"
+            if len(inframe_gene) > 0: in_frame = "in-frame"
+
+        ##########
         # check for exon-exon-junction
         if spliceClass == "":
             passGene = []
+            inframe_gene = []
             for gene in checkGenes:
                 if gene in gene1 and gene in gene2:
                     if gene in exon1 and gene in exon2:
