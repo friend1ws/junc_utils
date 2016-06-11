@@ -347,7 +347,7 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
 
      
 
-        print >> hout, '\t'.join(F[0:3]) + '\t' + spliceClass + '\t' + in_frame + '\t' + '\t'.join([';'.join(gene1), ';'.join(exonInfo1), ';'.join(junctionInfo1), ';'.join(gene2), ';'.join(exonInfo2), ';'.join(junctionInfo2)])
+        print >> hout, '\t'.join(F) + '\t' + spliceClass + '\t' + in_frame + '\t' + '\t'.join([';'.join(gene1), ';'.join(exonInfo1), ';'.join(junctionInfo1), ';'.join(gene2), ';'.join(exonInfo2), ';'.join(junctionInfo2)])
      
 
     hin.close()

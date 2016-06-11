@@ -32,7 +32,9 @@ def convert_anno2vcf(input_file, output_file, reference):
 
     for line in hin:
         F = line.rstrip('\n').split('\t')
-        
+        if F[0].startswith('#'): continue
+        if F[0] == "Chr" and F[1] == "Start" and F[2] == "End" and F[3] == "Ref" and F[4] == "Alt": continue
+
         pos, ref, alt = F[1], F[3], F[4]
         
         # insertion

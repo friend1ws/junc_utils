@@ -84,12 +84,10 @@ associate.add_argument("--debug", default = False, action = 'store_true', help =
 associate.add_argument('-f', choices=['vcf', 'anno'], default = 'vcf',
                        help = "the format of mutation file vcf or annovar (tsv) format")
 
-associate.add_argument("--ctrl", metavar = "control_file", default = None, type = str,
-                       help = "the path to the control panel junction")
-
 associate.add_argument('--sv', action='store_true',
                        help = "analysis structural variation file")
 
+associate.set_defaults(func = associate_main)
 
 ##########
 # merge control
