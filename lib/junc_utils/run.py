@@ -21,7 +21,7 @@ def associate_main(args):
     mutation_file = args.mutation_file
     output_prefix = args.output_prefix
     is_anno = True if args.f == "anno" else False
-    control_file = args.ctrl
+    # control_file = args.ctrl
     is_sv = True if args.sv else False
     is_debug = True if args.debug else False 
     reference_genome = args.reference_genome

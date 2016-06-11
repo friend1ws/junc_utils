@@ -55,9 +55,7 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
         sj_start = int(F[1]) - 1
         sj_end = int(F[2]) + 1
 
-        if F[2] == "120608012":
-            pass
-        if F[3] not in ["exon-skip", "splice-site-slip", "pseudo-exon-inclusion"]: continue
+        if F[9] not in ["exon-skip", "splice-site-slip", "pseudo-exon-inclusion"]: continue
         firstSearchRegion = [F[0], sj_start, sj_end]
         splicingMotifRegions = []
         targetGene  =[]
@@ -65,10 +63,10 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
         # we need to detect the non exon-intron junction break points
         # current procedure may be not perfect and be subject to change..
 
-        gene1 = F[5].split(';')
-        gene2 = F[8].split(';')
-        junction1 = F[7].split(';')   
-        junction2 = F[10].split(';')
+        gene1 = F[11].split(';')
+        gene2 = F[14].split(';')
+        junction1 = F[13].split(';')   
+        junction2 = F[16].split(';')
 
 
         # just consider genes sharing the exon-intron junction with the breakpoints of splicings
@@ -221,18 +219,16 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
     for line in hin:
         F = line.rstrip('\n').split('\t')
 
-        if F[2] == "7590695":
-            pass
 
         # if F[3] not in ["within-gene", "exon-skip", "exon-exon-junction", "spliced-chimera", "unspliced-chimera"]: continue
 
         sj_start = int(F[1]) - 1
         sj_end = int(F[2]) + 1
 
-        gene1 = F[5].split(';')
-        gene2 = F[8].split(';')
-        junction1 = F[7].split(';')
-        junction2 = F[10].split(';')
+        gene1 = F[11].split(';')
+        gene2 = F[14].split(';')
+        junction1 = F[13].split(';')
+        junction2 = F[16].split(';')
 
         """
         # just consider exon skipping genes
@@ -279,7 +275,7 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
         for mutation in mutation_sv:
             muts = mutation.split('\t')
             print >> hout, '\t'.join(F) + '\t' + muts[0] + '\t' + muts[2] + '\t' + muts[8] + '\t' + \
-                                                 muts[3] + '\t' + muts[5] + '\t' + muts[9]
+                                                 muts[3] + '\t' + muts[5] + '\t' + muts[9] + '\t' + muts[7]
 
     hin.close()
     hout.close()

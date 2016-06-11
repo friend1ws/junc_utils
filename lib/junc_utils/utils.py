@@ -78,6 +78,27 @@ def remove_vcf_header(input_file, output_file):
 
 
 
+def convert_genosv2bed(input_file, output_file):
+
+    hout = open(output_file, 'w')
+    num = 1
+    with open(input_file, 'r') as hin:
+        for line in hin:
+            F = line.rstrip('\n').split('\t')
+            if F[0].startswith('#'): continue
+            if F[0] == "Chr_1" and F[1] == "Pos_1": continue
+            chr1, chr2 = F[0], F[3]
+            start1, end1 = str(int(F[1]) - 1), F[1]
+            start2, end2 = str(int(F[4]) - 1), F[4]
+            dir1, dir2 = F[2], F[5]
+            name = "SV_" + str(num)
+            inseq = F[6] 
+
+            print >> hout, '\t'.join([chr1, start1, end1, chr2, start2, end2, name, inseq, dir1, dir2])
+
+    hout.close()
+
+
 def proc_star_junction(input_file, output_file, control_file, read_num_thres, overhang_thres, remove_annotated, convert_map_splice2):
     
     is_control = True if control_file is not None else False
