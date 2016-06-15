@@ -68,6 +68,8 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
         junction1 = F[13].split(';')   
         junction2 = F[16].split(';')
 
+        if F[2] == "49412926":
+            pass
 
         # just consider genes sharing the exon-intron junction with the breakpoints of splicings
         for i in range(0, len(gene1)):
@@ -77,7 +79,7 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
         targetGene = list(set(targetGene))
 
 
-        if F[3] in ["splice-site-slip", "pseudo-exon-inclusion"]:
+        if F[9] in ["splice-site-slip", "pseudo-exon-inclusion"]:
             # for non exon-intron junction breakpoints
             if "*" in junction1 and "s" in junction2: # splicing donnor motif, plus direction
                 firstSearchRegion[1] = firstSearchRegion[1] - searchMargin1
@@ -196,7 +198,7 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
         
     """
 
-    sv_comp_margin = 10
+    sv_comp_margin = 20
     exon_comp_margin = 10
 
 
@@ -230,6 +232,7 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
         junction1 = F[13].split(';')
         junction2 = F[16].split(';')
 
+
         """
         # just consider exon skipping genes
         for i in range(0, len(gene1)):
@@ -257,7 +260,8 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
                 # the SV should be deletion and the SV should be confied within spliced junction
                 if mutation[8] == '+' and mutation[9] == '-' and mutation[0] == F[0] and mutation[3] == F[0] and \
                   sj_start - sv_comp_margin <= int(mutation[2]) and int(mutation[5]) <= sj_end + sv_comp_margin:
-    
+
+                    """ 
                     # the splicing junction should be shared by SV breakpoint or exon-intron junction
                     junc_flag1 = 0
                     for i in range(0, len(gene1)):
@@ -266,9 +270,15 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
                     junc_flag2 = 0
                     for i in range(0, len(gene2)): 
                         if junction2[i] != "*": junc_flag2 = 1 
-                        
+                      
                     if junc_flag1 == 1 or abs(sj_start - int(mutation[2])) <= sv_comp_margin and \
                       junc_flag2 == 1 or abs(sj_end - int(mutation[5])) <= sv_comp_margin:
+                        mutation_sv.append('\t'.join(mutation))
+                    """
+
+                    if F[9] in ["exon-skip", "splice-site-slip", "pseudo-exon-inclusion"]: 
+                        mutation_sv.append('\t'.join(mutation))
+                    elif abs(sj_start - int(mutation[2])) <= sv_comp_margin and abs(sj_end - int(mutation[5])) <= sv_comp_margin:
                         mutation_sv.append('\t'.join(mutation))
 
 
