@@ -211,33 +211,61 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
                 if len(inframe_gene) > 0: in_frame = "in-frame"
 
             ##########
-            # check for splice-site slip 
+            # check for alternative-3'-splice-site
             if spliceClass == "":
                 passGene = []
                 inframe_gene = []
                 for gene in checkGenes:
                     if gene in gene1 and gene in gene2:
-                        if (gene in junction1 and gene in exon2 and gene not in junction2) or (gene in junction2 and gene in exon1 and gene not in junction1):
+                        if (gene in junction1 and junction1[gene] == "e" and gene not in junction2 and gene in exon2) or \
+                           (gene in junction2 and junction2[gene] == "e" and gene not in junction1 and gene in exon1):
                             passGene.append(gene)
-
                             if spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
                                 inframe_gene.append(gene)
 
-                if len(passGene) > 0: spliceClass = "splice-site-slip"
+                if len(passGene) > 0: spliceClass = "alternative-3'-splice-site"
                 if len(inframe_gene) > 0: in_frame = "in-frame"
-         
 
-            ##########
-            # check for pseudo-exon inclusion 
+
+            # check for alternative-5'-splice-site
             if spliceClass == "":
                 passGene = []
+                inframe_gene = []
                 for gene in checkGenes:
-                    if gene in gene1 and gene in gene2: 
-                        if (gene in junction1 and gene not in exon2) or (gene in junction2 and gene not in exon1): 
+                    if gene in gene1 and gene in gene2:
+                        if (gene in junction1 and junction1[gene] == "s" and gene not in junction2 and gene in exon2) or \
+                           (gene in junction2 and junction2[gene] == "s" and gene not in junction1 and gene in exon1):
                             passGene.append(gene)
-                        
-                if len(passGene) > 0: spliceClass = "pseudo-exon-inclusion"
+                            if spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
+                                inframe_gene.append(gene)
+            
+                if len(passGene) > 0: spliceClass = "alternative-5'-splice-site"
+                if len(inframe_gene) > 0: in_frame = "in-frame"
 
+            ##########
+            # check for intronic-alternative-3'-splice-site
+            if spliceClass == "":
+                passGene = []
+                inframe_gene = []
+                for gene in checkGenes:
+                    if gene in gene1 and gene in gene2:
+                        if (gene in junction1 and junction1[gene] == "e" and gene not in junction2 and gene not in exon2) or \
+                           (gene in junction2 and junction2[gene] == "e" and gene not in junction1 and gene not in exon1):
+                            passGene.append(gene)
+            
+                if len(passGene) > 0: spliceClass = "intronic-alternative-3'-splice-site"
+
+            # check for intronic-alternative-5'-splice-site
+            if spliceClass == "":
+                passGene = []
+                inframe_gene = []
+                for gene in checkGenes:
+                    if gene in gene1 and gene in gene2:
+                        if (gene in junction1 and junction1[gene] == "s" and gene not in junction2 and gene not in exon2) or \
+                           (gene in junction2 and junction2[gene] == "s" and gene not in junction1 and gene not in exon1):
+                            passGene.append(gene)
+                
+                if len(passGene) > 0: spliceClass = "intronic-alternative-5'-splice-site"
 
             ##########
             # within-exon

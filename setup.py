@@ -3,7 +3,7 @@
 from distutils.core import setup
 
 setup(name='junc_utils',
-      version='0.1.0beta',
+      version='0.2.0',
       description='Python programs for analyzing splicing junctions',
       author='Yuichi Shiraishi',
       author_email='friend1ws@gamil.com',
