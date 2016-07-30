@@ -313,10 +313,13 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
             
 
             # summarize the exon and junction information for display
+            geneInfo1 = []
             exonInfo1 = []
             junctionInfo1 = []
             if len(gene1) > 0:
                 for g1 in gene1:
+                    if g1 not in passGene: continue 
+                    geneInfo1.append(g1)
                     if g1 in exon1: 
                         exonInfo1.append(str(exon1[g1]))
                     else:
@@ -328,15 +331,18 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
                         junctionInfo1.append("*")
 
             else:
-                gene1.append("---")
+                geneInfo1.append("---")
                 exonInfo1.append("---")
                 junctionInfo1.append("---")
 
 
+            geneInfo2 = []
             exonInfo2 = []
             junctionInfo2 = []
             if len(gene2) > 0:
                 for g2 in gene2:
+                    if g2 not in passGene: continue
+                    geneInfo2.append(g2)
                     if g2 in exon2:
                         exonInfo2.append(str(exon2[g2]))
                     else:
@@ -348,14 +354,14 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
                         junctionInfo2.append("*")
                         
             else:
-                gene2.append("---")
+                geneInfo2.append("---")
                 exonInfo2.append("---")
                 junctionInfo2.append("---")
 
 
          
 
-            print >> hout, '\t'.join(F) + '\t' + spliceClass + '\t' + in_frame + '\t' + '\t'.join([';'.join(gene1), ';'.join(exonInfo1), ';'.join(junctionInfo1), ';'.join(gene2), ';'.join(exonInfo2), ';'.join(junctionInfo2)])
+            print >> hout, '\t'.join(F) + '\t' + spliceClass + '\t' + in_frame + '\t' + '\t'.join([';'.join(geneInfo1), ';'.join(exonInfo1), ';'.join(junctionInfo1), ';'.join(geneInfo2), ';'.join(exonInfo2), ';'.join(junctionInfo2)])
      
 
     hout.close()
