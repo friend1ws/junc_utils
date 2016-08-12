@@ -57,7 +57,7 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
             header2ind[header[i]] = i
 
         # print header
-        print >> hout, '\t'.join(header) + '\t' + "Mutation_Info" + '\t' + "Splicing_Motif_Pos" + '\t' + "Splicing_Mutation_Type" + '\t' + "Is_Cannonical"
+        print >> hout, '\t'.join(header) + '\t' + "Mutation_Key" + '\t' + "Motif_Pos" + '\t' + "Mutation_Type" + '\t' + "Is_Canonical"
 
         for line in hin:
             F = line.rstrip('\n').split('\t') 
@@ -195,7 +195,8 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
                             if editDistDiff < 0 and reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
 
                     for item in RegMut:
-                        print >> hout, '\t'.join(F) + '\t' + ','.join(mutation) + '\t' + F[header2ind["SJ_1"]] + ':' + str(item[0][1]) + '-' + str(item[0][2]) + ',' + item[0][4] + '\t' + item[1] + '\t' + item[2]
+                        mut_print_str = ','.join([mutation[i] for i in [0, 1, 3, 4]])
+                        print >> hout, '\t'.join(F) + '\t' + mut_print_str + '\t' + F[header2ind["SJ_1"]] + ':' + str(item[0][1]) + '-' + str(item[0][2]) + ',' + item[0][4] + '\t' + item[1] + '\t' + item[2]
 
 
     hout.close()
