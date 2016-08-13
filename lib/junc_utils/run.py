@@ -95,7 +95,7 @@ def associate_main(args):
     else:
         associate.get_sv_junction(args.annotated_junction_file,
                                   output_file,
-                                  output_prefix + ".mutran_tmp.bedpe.gz",               
+                                  output_file + ".mutran_tmp.bedpe.gz",               
                                   args.annotation_dir)
     ##########
 

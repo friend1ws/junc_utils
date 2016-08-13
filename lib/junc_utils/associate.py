@@ -279,8 +279,15 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
             if tabixErrorFlag1 == 0 and mutations is not None:
         
                 for mutation in mutations:
+
+                    """
                     # the SV should be deletion and the SV should be confied within spliced junction
                     if mutation[8] == '+' and mutation[9] == '-' and mutation[0] == F[0] and mutation[3] == F[0] and \
+                      sj_start - sv_comp_margin <= int(mutation[2]) and int(mutation[5]) <= sj_end + sv_comp_margin:
+                    """
+
+                    # the SV should be deletion, tandem duplication or inversion confied within spliced junction
+                    if  mutation[0] == F[0] and mutation[3] == F[0] and \
                       sj_start - sv_comp_margin <= int(mutation[2]) and int(mutation[5]) <= sj_end + sv_comp_margin:
 
                         """ 
@@ -298,7 +305,10 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
                             mutation_sv.append('\t'.join(mutation))
                         """
 
-                        if F[header2ind["Splicing_Class"]] in ["exon-skip", "splice-site-slip", "pseudo-exon-inclusion"]: 
+                        # if F[header2ind["Splicing_Class"]] in ["exon-skip", "splice-site-slip", "pseudo-exon-inclusion"]: 
+                        if F[header2ind["Splicing_Class"]] in ["exon-skip", "alternative-3'-splice-site", "alternative-5'-splice-site",
+                                                               "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]:
+
                             mutation_sv.append('\t'.join(mutation))
                         elif abs(sj_start - int(mutation[2])) <= sv_comp_margin and abs(sj_end - int(mutation[5])) <= sv_comp_margin:
                             mutation_sv.append('\t'.join(mutation))
