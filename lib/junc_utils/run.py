@@ -88,11 +88,18 @@ def associate_main(args):
     ##########
     # associate mutation and junction
     if not is_sv:
+        """
         associate.get_snv_junction(args.annotated_junction_file,
                                    output_file,
                                    output_file + ".mutran_tmp.vcf.gz",
                                    args.annotation_dir, True, args.skip_creation_indel)
                                    # args.annotation_dir, args.is_edit_dist, args.skip_creation_indel)
+        """
+        associate.get_snv_junction2(args.annotated_junction_file,
+                                    output_file,
+                                    output_file + ".mutran_tmp.vcf.gz",
+                                    args.annotation_dir, args.donor_size, args.acceptor_size)
+
     else:
         associate.get_sv_junction(args.annotated_junction_file,
                                   output_file,
