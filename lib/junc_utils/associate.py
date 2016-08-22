@@ -5,7 +5,7 @@ import tabix
 import numpy
 
 
-def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
+def get_snv_junction(input_file, output_file, mutation_file, annotation_dir, is_edit_dist, skip_creation_indel):
 
     """
         a script for detecting candidate somatic substitutions causing splicing changes
@@ -154,7 +154,11 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
                     for reg in splicingMotifRegions:
 
                         # insertion or deletion (just consider the disruption of splicing motifs now)
-                        if (len(mutation[3]) > 1 or len(mutation[4]) > 1) and reg[5] == 1:
+                        # if (len(mutation[3]) > 1 or len(mutation[4]) > 1) and reg[5] == 1:
+                        if (len(mutation[3]) > 1 or len(mutation[4]) > 1):
+
+                            if skip_creation_indel and reg[5] == 0: continue
+
                             indel_start = int(mutation[1]) + 1
                             indel_end = int(mutation[1]) + len(mutation[3]) - 1 if len(mutation[3]) > 1 else indel_start
                             if indel_start <= reg[2] and reg[1] <= indel_end:
@@ -191,8 +195,12 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir):
                             if reg[3] == "donor" and reg[4] == "+" and reg[1] + 2 <= int(mutation[1]) <= reg[2] - 4: is_canonical = "canonical"
                             if reg[3] == "donor" and reg[4] == "-" and reg[1] + 4 <= int(mutation[1]) <= reg[2] - 2: is_canonical = "canonical"
 
-                            if editDistDiff > 0 and reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
-                            if editDistDiff < 0 and reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
+                            if is_edit_dist:
+                                if editDistDiff > 0 and reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
+                                if editDistDiff < 0 and reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
+                            else:
+                                if reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
+                                if reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
 
                     for item in RegMut:
                         mut_print_str = ','.join([mutation[i] for i in [0, 1, 3, 4]])
@@ -237,7 +245,7 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
             header2ind[header[i]] = i
 
         # print header
-        print >> hout, '\t'.join(header) + '\t' + "SV_Info"
+        print >> hout, '\t'.join(header) + '\t' + "SV_Key" + '\t' + "SV_Type" + '\t' + "Dist_To_Junc1" + '\t' + "Dist_To_Junc2"
 
 
         for line in hin:
@@ -286,7 +294,7 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
                       sj_start - sv_comp_margin <= int(mutation[2]) and int(mutation[5]) <= sj_end + sv_comp_margin:
                     """
 
-                    # the SV should be deletion, tandem duplication or inversion confied within spliced junction
+                    # the SV should be deletion, tandem duplication or confied within spliced junction
                     if  mutation[0] == F[0] and mutation[3] == F[0] and \
                       sj_start - sv_comp_margin <= int(mutation[2]) and int(mutation[5]) <= sj_end + sv_comp_margin:
 
@@ -313,11 +321,21 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
                         elif abs(sj_start - int(mutation[2])) <= sv_comp_margin and abs(sj_end - int(mutation[5])) <= sv_comp_margin:
                             mutation_sv.append('\t'.join(mutation))
 
+                            
 
             for mutation in mutation_sv:
                 muts = mutation.split('\t')
+
+                sv_type = "inversion"
+                if muts[8] == "+" and muts[9] == "-": sv_type = "deletion"
+                if muts[8] == "-" and muts[9] == "+": sv_type = "tandem_duplication"
+
+                junc_to_dist1 = int(muts[2]) - sj_start
+                junc_to_dist2 = sj_end - int(muts[5])
+
                 print >> hout, '\t'.join(F) + '\t' + muts[0] + ',' + muts[2] + ',' + muts[8] + ',' + \
-                                                     muts[3] + ',' + muts[5] + ',' + muts[9] + ',' + muts[7]
+                                                     muts[3] + ',' + muts[5] + ',' + muts[9] + ',' + muts[7] + '\t' + \
+                                                     sv_type + '\t' + str(junc_to_dist1) + '\t' + str(junc_to_dist2)
 
     hout.close()
 

@@ -28,7 +28,7 @@ def associate_main(args):
 
 
     output_dir = os.path.dirname(output_file)
-    if output_dir != "" and not os.path.exists(output_file):
+    if output_dir != "" and not os.path.exists(output_dir):
        os.makedirs(output_dir)
 
     ##########
@@ -91,7 +91,8 @@ def associate_main(args):
         associate.get_snv_junction(args.annotated_junction_file,
                                    output_file,
                                    output_file + ".mutran_tmp.vcf.gz",
-                                   args.annotation_dir)
+                                   args.annotation_dir, True, args.skip_creation_indel)
+                                   # args.annotation_dir, args.is_edit_dist, args.skip_creation_indel)
     else:
         associate.get_sv_junction(args.annotated_junction_file,
                                   output_file,

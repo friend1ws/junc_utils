@@ -23,16 +23,22 @@ with open(input_file, 'r') as hin:
 
 ##########
 # right combination
-
+header_ind = 0
 hout = open(output_dir + ("/splicing_sv_list.txt" if "--sv" in additional_params else "/splicing_mutation_list.txt"), 'w')
 for ID in sorted(ID2junction): 
     output_prefix = output_dir + '/' + ID
     params = additional_params.split(' ')
-    print ' '.join(["junc_utils", "associate", ID2mutation[ID], ID2junction[ID], output_prefix] + params)
-    subprocess.call(["junc_utils", "associate", ID2mutation[ID], ID2junction[ID], output_prefix] + params)
-    
+
     output_file = output_prefix + (".splicing_sv.txt" if "--sv" in additional_params else ".splicing_mutation.txt")
+    print ' '.join(["junc_utils", "associate", ID2junction[ID], ID2mutation[ID], output_file] + params)
+    subprocess.call(["junc_utils", "associate", ID2junction[ID], ID2mutation[ID], output_file] + params)
+   
     with open(output_file, 'r') as hin:
+        header = hin.readline().rstrip('\n')
+        if header_ind == 0:
+            print >> hout, "Sample_ID" + '\t' + header
+            header_ind = 1
+
         for line in hin:
             line = line.rstrip('\n')
             print >> hout, ID + '\t' + line
@@ -42,6 +48,7 @@ hout.close()
 
 ##########
 # permutation
+header_ind = 0
 for i in range(int(repeat_num)):
 
     print "permutation:" + str(int(i) + 1)
@@ -64,11 +71,18 @@ for i in range(int(repeat_num)):
     for ID in sorted(ID2junction):
         output_prefix = output_dir + '/' + ID + '.' + ID_perm[ID]
         params = additional_params.split(' ')
-        print ' '.join(["junc_utils", "associate", ID2mutation[ID], ID2junction[ID_perm[ID]], output_prefix] + params)
-        subprocess.call(["junc_utils", "associate", ID2mutation[ID], ID2junction[ID_perm[ID]], output_prefix] + params)
 
         output_file = output_prefix + (".splicing_sv.txt" if "--sv" in additional_params else ".splicing_mutation.txt")
+
+        print ' '.join(["junc_utils", "associate", ID2junction[ID_perm[ID]], ID2mutation[ID], output_file] + params)
+        subprocess.call(["junc_utils", "associate", ID2junction[ID_perm[ID]], ID2mutation[ID], output_file] + params)
+
         with open(output_file, 'r') as hin:
+            header = hin.readline().rstrip('\n')
+            if header_ind == 0:
+                print >> hout, "Sample_ID" + '\t' "sample_ID_perm" + '\t' + header
+                header_ind = 1
+
             for line in hin:
                 line = line.rstrip('\n')
                 print >> hout, ID + '\t' + ID_perm[ID] + '\t' + line
