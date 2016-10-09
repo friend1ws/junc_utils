@@ -95,10 +95,17 @@ def associate_main(args):
                                    args.annotation_dir, True, args.skip_creation_indel)
                                    # args.annotation_dir, args.is_edit_dist, args.skip_creation_indel)
         """
-        associate.get_snv_junction2(args.annotated_junction_file,
-                                    output_file,
-                                    output_file + ".mutran_tmp.vcf.gz",
-                                    args.annotation_dir, args.donor_size, args.acceptor_size)
+
+        if not args.only_dist:
+            associate.get_snv_junction2(args.annotated_junction_file,
+                                        output_file,
+                                        output_file + ".mutran_tmp.vcf.gz",
+                                        args.annotation_dir, args.donor_size, args.acceptor_size)
+        else:
+            associate.get_snv_junction_only_dist(args.annotated_junction_file, 
+                                                 output_file, 
+                                                 output_file + ".mutran_tmp.vcf.gz",
+                                                 args.annotation_dir, args.only_dist_search_margin)
 
     else:
         associate.get_sv_junction(args.annotated_junction_file,

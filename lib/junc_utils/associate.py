@@ -169,9 +169,8 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir, is_
                                 if reg[3] == "donor" and reg[4] == "+" and indel_start <= reg[2] - 4 and reg[1] + 2 <= indel_end: is_canonical = "canonical" 
                                 if reg[3] == "donor" and reg[4] == "-" and indel_start <= reg[2] - 2 and reg[1] + 4 <= indel_end: is_canonical = "canonical" 
 
-
                                 RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
-                        
+
                         # base substitution
                         if len(mutation[3]) == 1 and len(mutation[4]) == 1 and reg[1] <= int(mutation[1]) <= reg[2]:
                             motifSeq = ""
@@ -371,8 +370,9 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
 
                                 is_canonical = "canonical" if indel_start <= canonical_start_pos + 1 and canonical_start_pos <= indel_end else "non-canonical"
 
-                                RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
-                        
+                                if reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
+                                if reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
+ 
                         # base substitution
                         if len(mutation[3]) == 1 and len(mutation[4]) == 1 and reg[1] <= int(mutation[1]) <= reg[2]:
                             motifSeq = ""
@@ -397,6 +397,65 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
     hout.close()
 
 
+
+
+def get_snv_junction_only_dist(input_file, output_file, mutation_file, annotation_dir, searchMargin):
+
+    ref_exon_bed = annotation_dir + "/refExon.bed.gz"
+    grch2ucsc_file = annotation_dir + "/grch2ucsc.txt"
+
+    # relationship between CRCh and UCSC chromosome names
+    grch2ucsc = {}
+    with open(grch2ucsc_file, 'r') as hin:
+        for line in hin:
+            F = line.rstrip('\n').split('\t')
+            grch2ucsc[F[0]] = F[1]
+
+    hout = open(output_file, 'w')
+    mutation_tb = tabix.open(mutation_file)
+
+    header2ind = {}
+    with open(input_file, 'r') as hin:
+        
+        # read header
+        header = hin.readline().rstrip('\n').split('\t')
+        for i in range(len(header)):
+            header2ind[header[i]] = i
+
+        # print header
+        print >> hout, '\t'.join(header) + '\t' + "Mutation_Key" + '\t' + "Motif_Pos" + '\t' + "Mutation_Type" + '\t' + "Is_Canonical"
+
+        for line in hin:
+            F = line.rstrip('\n').split('\t') 
+
+            sj_start = int(F[header2ind["SJ_2"]]) - 1
+            sj_end = int(F[header2ind["SJ_3"]]) + 1
+
+            if F[header2ind["Splicing_Class"]] not in ["exon-skip", "alternative-3'-splice-site", "alternative-5'-splice-site",
+                                                       "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]: continue
+
+            firstSearchRegion = [F[header2ind["SJ_1"]], sj_start, sj_end]
+
+            ##########
+            # rough check for the mutation between the spliced region
+            tabixErrorFlag1 = 0
+            try:
+                mutations = mutation_tb.query(firstSearchRegion[0], firstSearchRegion[1] - searchMargin, firstSearchRegion[2] + searchMargin)
+            except Exception as inst:
+                # print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
+                # print >> sys.stderr, '\t'.join(F)
+                tabixErrorFlag1 = 1
+
+            # if there are some mutaions
+            if tabixErrorFlag1 == 0 and mutations is not None:
+
+                for mutation in mutations:
+
+                    mut_print_str = ','.join([mutation[i] for i in [0, 1, 3, 4]])
+                    print >> hout, '\t'.join(F) + '\t' + mut_print_str + '\t' + "---,---" + '\t' + "---" + '\t' + "---"
+
+
+    hout.close()
 
 
 def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
