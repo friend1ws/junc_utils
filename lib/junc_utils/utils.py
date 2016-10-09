@@ -42,8 +42,9 @@ def convert_anno2vcf(input_file, output_file, reference):
             # get the sequence for the reference base
             seq = ""    
             for item in pysam.faidx(reference, F[0] + ":" + str(F[1]) + "-" + str(F[1])):
-                if item[0] == ">": continue
                 seq = seq + item.rstrip('\n')
+            seq = seq.replace('>', '')
+            seq = seq.replace(F[0] + ":" + str(F[1]) + "-" + str(F[1]), '')
             ref, alt = seq, seq + F[4]
 
         # deletion
@@ -51,9 +52,9 @@ def convert_anno2vcf(input_file, output_file, reference):
             # get the sequence for the reference base
             seq = ""    
             for item in pysam.faidx(reference, F[0] + ":" + str(int(F[1]) - 1) + "-" + str(int(F[1]) - 1)):
-                if item[0] == ">": continue
                 seq = seq + item.rstrip('\n')
-
+            seq = seq.replace('>', '')
+            seq = seq.replace(F[0] + ":" + str(int(F[1]) - 1) + "-" + str(int(F[1]) - 1), '')
             pos, ref, alt = str(int(F[1]) - 1), seq + F[3], seq
 
 
