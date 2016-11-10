@@ -100,7 +100,8 @@ def associate_main(args):
             associate.get_snv_junction2(args.annotated_junction_file,
                                         output_file,
                                         output_file + ".mutran_tmp.vcf.gz",
-                                        args.annotation_dir, args.donor_size, args.acceptor_size)
+                                        args.annotation_dir, args.donor_size, args.acceptor_size,
+                                        args.is_branchpoint, args.branchpoint_size)
         else:
             associate.get_snv_junction_only_dist(args.annotated_junction_file, 
                                                  output_file, 

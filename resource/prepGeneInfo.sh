@@ -17,6 +17,9 @@ rm -rf ensGene.txt.gz
 wget http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/refGene.txt.gz
 wget http://hgdownload.cse.ucsc.edu/goldenPath/hg19/database/ensGene.txt.gz
 
+# branchpoint (Mercer et al., Genome Research, 2015)
+wget http://genome.cshlp.org/content/suppl/2014/12/16/gr.182899.114.DC1/Supplemental_DataS2.bed.gz
+
 echo "python listGene.py refGene.txt.gz ref | sort -k1,1 -k2,2n -k3,3n - > refGene.bed"
 python listGene.py refGene.txt.gz ref | sort -k1,1 -k2,2n -k3,3n - > refGene.bed
 
@@ -62,4 +65,8 @@ tabix -f -p bed ensExon.bed.gz
 
 echo "tabix -f -p bed refCoding.bed.gz"
 tabix -f -p bed refCoding.bed.gz
+
+# branchpoint
+sort -k1,1 -k2,2n Supplemental_DataS2.bed | bgzip -c > branchpoint_mercer.bed.gz
+tabix -p bed branchpoint_mercer.bed.gz
 

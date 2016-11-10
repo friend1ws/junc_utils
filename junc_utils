@@ -105,6 +105,12 @@ associate.add_argument("--only_dist_search_margin", metavar = "only_dist_search_
 associate.add_argument('--sv', action='store_true',
                        help = "analysis structural variation file")
 
+associate.add_argument('--is_branchpoint', action='store_true',
+                       help = "include branch points to the association analysis")
+
+associate.add_argument("--branchpoint_size", metavar = "branchpoint_size", default = "3,2", type = str,
+                       help = "splicing branchpoint size (intronic-side region size, exonic-side region size) (default: %(default)s)")
+
 associate.set_defaults(func = associate_main)
 
 ##########

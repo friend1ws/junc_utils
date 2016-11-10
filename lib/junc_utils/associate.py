@@ -4,7 +4,7 @@ import sys
 import tabix
 import numpy
 
-
+# this is deprecated!!!
 def get_snv_junction(input_file, output_file, mutation_file, annotation_dir, is_edit_dist, skip_creation_indel):
 
     """
@@ -210,7 +210,7 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir, is_
 
 
 
-def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, donor_size, acceptor_size):
+def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, donor_size, acceptor_size, is_branchpoint = False, branch_size = "3,3"):
 
     """
         a script for detecting candidate somatic substitutions causing splicing changes
@@ -227,7 +227,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
 
     donor_size_exon, donor_size_intron = [int(x) for x in donor_size.split(',')]
     acceptor_size_intron, acceptor_size_exon = [int(x) for x in acceptor_size.split(',')]
-
+    branch_size_intron, branch_size_exon = [int(x) for x in branch_size.split(',')]
 
     searchMargin1 = 30
     searchMargin2 = 10
@@ -238,6 +238,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
 
     ref_exon_bed = annotation_dir + "/refExon.bed.gz"
     grch2ucsc_file = annotation_dir + "/grch2ucsc.txt"
+    branchpoint_bed = annotation_dir + "/branchpoint_mercer.bed.gz"
 
     # relationship between CRCh and UCSC chromosome names
     grch2ucsc = {}
@@ -247,8 +248,10 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
             grch2ucsc[F[0]] = F[1]
 
     hout = open(output_file, 'w')
+
     mutation_tb = tabix.open(mutation_file)
     exon_tb = tabix.open(ref_exon_bed)
+    if is_branchpoint: branch_tb = tabix.open(branchpoint_bed)
 
     header2ind = {}
     with open(input_file, 'r') as hin:
@@ -348,6 +351,24 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
                             splicingMotifRegions.append((exon[0], int(exon[2]) - acceptor_size_exon + 1, int(exon[2]) + acceptor_size_intron, "acceptor", "-", 1))
 
 
+                # check branchpoint within the spliced regions
+                if is_branchpoint:
+                    tabixErrorFlag3 = 0
+                    try:
+                        branches = branch_tb.query(chr_name, firstSearchRegion[1], firstSearchRegion[2])
+                    except Exception as inst:
+                        print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
+                        print >> sys.stderr, '\t'.join(F)
+                        tabixErrorFlag3 = 3
+
+                    if tabixErrorFlag3 == 0:
+                        for branch in branches:
+                            if branch[5] == "+":
+                                splicingMotifRegions.append((branch[0], int(branch[2]) - branch_size_intron, int(branch[2]) + branch_size_exon - 1, "branchpoint", "+", 1))
+                            else:
+                                splicingMotifRegions.append((branch[0], int(branch[2]) - branch_size_exon + 1, int(branch[2]) + branch_size_intron, "branchpoint", "-", 1))
+
+
                 splicingMotifRegions = list(set(splicingMotifRegions))
 
                 # compare each mutation with exon-intron junction regions and non-exon-intorn junction breakpoints.
@@ -362,13 +383,16 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
                             indel_start = int(mutation[1]) + 1
                             indel_end = int(mutation[1]) + len(mutation[3]) - 1 if len(mutation[3]) > 1 else indel_start
                             if indel_start <= reg[2] and reg[1] <= indel_end:
-                            
-                                if reg[3] == "acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
-                                if reg[3] == "acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
-                                if reg[3] == "donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
-                                if reg[3] == "donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
+                           
+                                if reg[3] in ["acceptor", "donor"]: 
+                                    if reg[3] == "acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
+                                    if reg[3] == "acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
+                                    if reg[3] == "donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
+                                    if reg[3] == "donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
 
-                                is_canonical = "canonical" if indel_start <= canonical_start_pos + 1 and canonical_start_pos <= indel_end else "non-canonical"
+                                    is_canonical = "canonical" if indel_start <= canonical_start_pos + 1 and canonical_start_pos <= indel_end else "non-canonical"
+                                else:
+                                    is_canonical = "non-canonical"
 
                                 if reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
                                 if reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
@@ -379,12 +403,15 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
                             if reg[3] == "acceptor": motifSeq = splicingAcceptorMotif[0] + splicingAcceptorMotif[1]                  
                             if reg[3] == "donor": motifSeq = splicingDonnorMotif[0] + splicingDonnorMotif[1]
 
-                            if reg[3] == "acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
-                            if reg[3] == "acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
-                            if reg[3] == "donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
-                            if reg[3] == "donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
+                            if reg[3] in ["acceptor", "donor"]:
+                                if reg[3] == "acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
+                                if reg[3] == "acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
+                                if reg[3] == "donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
+                                if reg[3] == "donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
 
-                            is_canonical = "canonical" if canonical_start_pos <= int(mutation[1]) <= canonical_start_pos + 1 else "non-canonical"
+                                is_canonical = "canonical" if canonical_start_pos <= int(mutation[1]) <= canonical_start_pos + 1 else "non-canonical"
+                            else:
+                                is_canonical = "non-canonical"                
 
                             if reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
                             if reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
