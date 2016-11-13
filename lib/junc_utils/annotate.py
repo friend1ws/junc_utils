@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
 import pysam 
-import sys
+import sys, subprocess
+import annot_utils.gene, annot_utils.exon, annot_utils.coding
 
 def spliced_coding_size(gene1, gene2, sj_chr, sj_start, sj_end, ref_coding_tb, exon_margin):
 
@@ -33,8 +34,8 @@ def spliced_coding_size(gene1, gene2, sj_chr, sj_start, sj_end, ref_coding_tb, e
     return coding_size
 
  
-def annot_junction(input_file, output_file, annotation_dir, junction_margin, exon_margin):
-
+# def annot_junction(input_file, output_file, annotation_dir, junction_margin, exon_margin):
+def annot_junction(input_file, output_file, junction_margin, exon_margin, genome_id = "hg19", is_grc = True):
     """
         The purpose of this script is to classify splicing changes
         mainly by comparing the two breakpoints with the exon-intorn junction of genes
@@ -68,22 +69,14 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
 
     """
 
-    ref_gene_bed = annotation_dir + "/refGene.bed.gz"
-    ref_exon_bed = annotation_dir + "/refExon.bed.gz"
-    ref_coding_bed = annotation_dir + "/refCoding.bed.gz"
-    grch2ucsc_file = annotation_dir + "/grch2ucsc.txt"
-
-    # relationship between CRCh and UCSC chromosome names
-    grch2ucsc = {}
-    with open(grch2ucsc_file, 'r') as hin:
-        for line in hin:
-            F = line.rstrip('\n').split('\t')
-            grch2ucsc[F[0]] = F[1]
-
-    hout = open(output_file, 'w')
-    gene_tb = pysam.TabixFile(ref_gene_bed)
-    exon_tb = pysam.TabixFile(ref_exon_bed)
-    coding_tb = pysam.TabixFile(ref_coding_bed)
+    annot_utils.gene.make_gene_info(output_file + ".tmp.refGene.bed.gz", "refseq", genome_id, is_grc, True)
+    annot_utils.exon.make_exon_info(output_file + ".tmp.refExon.bed.gz", "refseq", genome_id, is_grc, True)
+    annot_utils.coding.make_coding_info(output_file + ".tmp.refCoding.bed.gz", "refseq", genome_id, is_grc, True)
+    
+    hout = open(output_file, 'w') 
+    gene_tb = pysam.TabixFile(output_file + ".tmp.refGene.bed.gz")
+    exon_tb = pysam.TabixFile(output_file + ".tmp.refExon.bed.gz")
+    coding_tb = pysam.TabixFile(output_file + ".tmp.refCoding.bed.gz") 
 
     # read header
     with open(input_file, 'r') as hin:
@@ -97,8 +90,7 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
     with open(input_file, 'r') as hin:
         for line in hin:
             F = line.rstrip('\n').split('\t')
-            chr_name = grch2ucsc[F[0]] if F[0] in grch2ucsc else F[0]
-
+            chr_name = F[0]
             sj_start = int(F[1]) - 1
             sj_end = int(F[2]) + 1
             ##########
@@ -412,5 +404,12 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
 
     hout.close()
 
+
+    subprocess.call(["rm", "-rf", output_file + ".tmp.refGene.bed.gz"])
+    subprocess.call(["rm", "-rf", output_file + ".tmp.refGene.bed.gz.tbi"]) 
+    subprocess.call(["rm", "-rf", output_file + ".tmp.refExon.bed.gz"]) 
+    subprocess.call(["rm", "-rf", output_file + ".tmp.refExon.bed.gz.tbi"])
+    subprocess.call(["rm", "-rf", output_file + ".tmp.refCoding.bed.gz"]) 
+    subprocess.call(["rm", "-rf", output_file + ".tmp.refCoding.bed.gz.tbi"])
 
 

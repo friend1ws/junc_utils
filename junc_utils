@@ -47,8 +47,14 @@ annotate.add_argument("junc_file", metavar = "sample.SJ.out.tab", default = None
 annotate.add_argument("output_path", metavar = "output.txt", default = None, type = str,
                       help = "the path to the output file")
 
-annotate.add_argument("annotation_dir", metavar = "annotation_dir", default = None, type = str,
-                      help = "the path to the database directory")
+# annotate.add_argument("annotation_dir", metavar = "annotation_dir", default = None, type = str,
+#                       help = "the path to the database directory")
+
+annotate.add_argument("--grc", default = False, action = 'store_true',
+                      help = "convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
+
+annotate.add_argument("--genome_id", choices = ["hg19", "hg38", "mm10"], default = "hg19",
+                      help = "the genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
 
 annotate.add_argument("--junction_margin", type = int, default = 3,
                       help = "the allowed margin size for the difference between splicing breakpoints and exon-intron junctions")
@@ -73,8 +79,14 @@ associate.add_argument("mutation_file", metavar = "mutation.vcf.gz", default = N
 associate.add_argument("output_file", metavar = "output_file", default = None, type = str, 
                        help = "the path to the output")
 
-associate.add_argument("annotation_dir", metavar = "annotation_dir", type = str,
-                       help = "the path to database directory")
+# associate.add_argument("annotation_dir", metavar = "annotation_dir", type = str,
+#                        help = "the path to database directory")
+
+associate.add_argument("--grc", default = False, action = 'store_true',
+                       help = "convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
+
+associate.add_argument("--genome_id", choices = ["hg19", "hg38", "mm10"], default = "hg19",
+                       help = "the genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
 
 associate.add_argument("--donor_size", metavar = "donor_size", default = "2,8", type = str,
                        help = "splicing donor site size (exonic region size, intronic region size) (default: %(default)s)")
@@ -105,7 +117,7 @@ associate.add_argument("--only_dist_search_margin", metavar = "only_dist_search_
 associate.add_argument('--sv', action='store_true',
                        help = "analysis structural variation file")
 
-associate.add_argument('--is_branchpoint', action='store_true',
+associate.add_argument('--branchpoint', action='store_true',
                        help = "include branch points to the association analysis")
 
 associate.add_argument("--branchpoint_size", metavar = "branchpoint_size", default = "3,2", type = str,

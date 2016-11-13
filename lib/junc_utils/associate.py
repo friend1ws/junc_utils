@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 
-import sys
+import sys, subprocess, pkg_resources
 # import tabix
 import pysam
 import numpy
+import annot_utils.exon
 
 # this is deprecated!!!
 def get_snv_junction(input_file, output_file, mutation_file, annotation_dir, is_edit_dist, skip_creation_indel):
@@ -211,7 +212,8 @@ def get_snv_junction(input_file, output_file, mutation_file, annotation_dir, is_
 
 
 
-def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, donor_size, acceptor_size, is_branchpoint = False, branch_size = "3,3"):
+def get_snv_junction2(input_file, output_file, mutation_file, donor_size, acceptor_size, 
+                      genome_id, is_grc, is_branchpoint, branch_size):
 
     """
         a script for detecting candidate somatic substitutions causing splicing changes
@@ -236,23 +238,21 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
     splicingDonnorMotif = ["AG", "GTRAGT"]
     splicingAcceptorMotif = ["YYYYNCAG", "G"]
 
-
-    ref_exon_bed = annotation_dir + "/refExon.bed.gz"
-    grch2ucsc_file = annotation_dir + "/grch2ucsc.txt"
-    branchpoint_bed = annotation_dir + "/branchpoint_mercer.bed.gz"
-
-    # relationship between CRCh and UCSC chromosome names
-    grch2ucsc = {}
-    with open(grch2ucsc_file, 'r') as hin:
-        for line in hin:
-            F = line.rstrip('\n').split('\t')
-            grch2ucsc[F[0]] = F[1]
+    annot_utils.exon.make_exon_info(output_file + ".tmp.refExon.bed.gz", "refseq", genome_id, is_grc, True)
 
     hout = open(output_file, 'w')
 
     mutation_tb = pysam.TabixFile(mutation_file)
-    exon_tb = pysam.TabixFile(ref_exon_bed)
-    if is_branchpoint: branch_tb = pysam.TabixFile(branchpoint_bed)
+    exon_tb = pysam.TabixFile(output_file + ".tmp.refExon.bed.gz")
+    if is_branchpoint:
+        if genome_id != "hg19":
+            print >> sys.stderr, "branchpoint can be used only for hg19"
+            sys.exit(1)
+        if is_grc:
+            branchpoint_bed = pkg_resources.resource_filename("annot_utils", "data/hg19/branchpoint_mercer.grc.bed.gz")
+        else:
+            branchpoint_bed = pkg_resources.resource_filename("annot_utils", "data/hg19/branchpoint_mercer.bed.gz")
+        branch_tb = pysam.TabixFile(branchpoint_bed)
 
     header2ind = {}
     with open(input_file, 'r') as hin:
@@ -299,35 +299,6 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
             if F[header2ind["Splicing_Class"]] in ["alternative-3'-splice-site", "alternative-5'-splice-site",
                                                    "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]:
 
-                """
-                # for non exon-intron junction breakpoints
-                if "*" in junction1 and "s" in junction2: # splicing donor motif, plus direction
-                    firstSearchRegion[1] = firstSearchRegion[1] - searchMargin1
-                    splicingMotifRegions.append((F[header2ind["SJ_1"]], sj_start - donor_size_exon + 1, sj_start + donor_size_intron, "donor", "+", 0))
-                if "*" in junction1 and "e" in junction2: # splicing acceptor motif, minus direction
-                    firstSearchRegion[1] = firstSearchRegion[1] - searchMargin1
-                    splicingMotifRegions.append((F[header2ind["SJ_1"]], sj_start - acceptor_size_exon + 1, sj_start + acceptor_size_intron, "acceptor", "-", 0))
-                    if abs(sj_start - 7574078) <= 5:
-                        print "TP53"
-                        print splicingMotifRegions
-                        print firstSearchRegion[1]
-
-                if "s" in junction1 and "*" in junction2: # splicing donor motif, minus direction
-                    firstSearchRegion[2] = firstSearchRegion[2] + searchMargin1
-                    splicingMotifRegions.append((F[header2ind["SJ_1"]], sj_end - donor_size_intron, sj_end + donor_size_exon - 1, "donor", "-", 0))
-                if "e" in junction1 and "*" in junction2: # # splicing acceptor motif, plus direction
-                    firstSearchRegion[2] = firstSearchRegion[2] + searchMargin1
-                    splicingMotifRegions.append((F[header2ind["SJ_1"]], sj_end - acceptor_size_intron, sj_end + acceptor_size_exon - 1, "acceptor", "+", 0))
-                """
-    
-                """
-                if abs(sj_start - 7574078) <= 5:
-                    print junction1
-                    print junction2
-                    print "*" in junction1
-                    print "e" in junction2
-                """
-
                 # for non exon-intron junction breakpoints
                 for i in range(0, len(gene1)):
 
@@ -366,7 +337,8 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
             # if there are some mutaions
             if tabixErrorFlag1 == 0 and mutation_lines is not None:
 
-                chr_name = grch2ucsc[F[header2ind["SJ_1"]]] if F[header2ind["SJ_1"]] in grch2ucsc else F[header2ind["SJ_1"]] 
+                # chr_name = grch2ucsc[F[header2ind["SJ_1"]]] if F[header2ind["SJ_1"]] in grch2ucsc else F[header2ind["SJ_1"]] 
+                chr_name = F[header2ind["SJ_1"]] 
                 # check the exons within the spliced regions
                 tabixErrorFlag2 = 0
                 try:
@@ -434,7 +406,13 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
                                     if reg[3] == "donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
                                     if reg[3] == "donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
 
-                                    is_canonical = "canonical" if indel_start <= canonical_start_pos + 1 and canonical_start_pos <= indel_end else "non-canonical"
+                                    is_canonical = "non-canonical"
+                                    if len(mutation[3]) > 1: # deletion
+                                        if indel_start <= canonical_start_pos + 1 and canonical_start_pos <= indel_end:
+                                            is_canonical = "canonical"
+                                    else: # insertion
+                                        if indel_start == canonical_start_pos + 1:
+                                            is_canonical = "canonical"
                                 else:
                                     is_canonical = "non-canonical"
 
@@ -467,6 +445,8 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
 
     hout.close()
 
+    subprocess.call(["rm", "-rf", output_file + ".tmp.refExon.bed.gz"])
+    subprocess.call(["rm", "-rf", output_file + ".tmp.refExon.bed.gz.tbi"])
 
 
 
