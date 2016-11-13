@@ -229,7 +229,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
     acceptor_size_intron, acceptor_size_exon = [int(x) for x in acceptor_size.split(',')]
     branch_size_intron, branch_size_exon = [int(x) for x in branch_size.split(',')]
 
-    searchMargin1 = 30
+    searchMargin1 = 50 
     searchMargin2 = 10
 
     splicingDonnorMotif = ["AG", "GTRAGT"]
@@ -284,7 +284,8 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
             gene2 = F[header2ind["Gene_2"]].split(';')
             junction1 = F[header2ind["Is_Boundary_1"]].split(';')   
             junction2 = F[header2ind["Is_Boundary_2"]].split(';')
-
+            offset1 = F[header2ind["Offset_1"]].split(';')
+            offset2 = F[header2ind["Offset_2"]].split(';')
 
             # just consider genes sharing the exon-intron junction with the breakpoints of splicings
             for i in range(0, len(gene1)):
@@ -297,6 +298,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
             if F[header2ind["Splicing_Class"]] in ["alternative-3'-splice-site", "alternative-5'-splice-site",
                                                    "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]:
 
+                """
                 # for non exon-intron junction breakpoints
                 if "*" in junction1 and "s" in junction2: # splicing donor motif, plus direction
                     firstSearchRegion[1] = firstSearchRegion[1] - searchMargin1
@@ -304,12 +306,50 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
                 if "*" in junction1 and "e" in junction2: # splicing acceptor motif, minus direction
                     firstSearchRegion[1] = firstSearchRegion[1] - searchMargin1
                     splicingMotifRegions.append((F[header2ind["SJ_1"]], sj_start - acceptor_size_exon + 1, sj_start + acceptor_size_intron, "acceptor", "-", 0))
+                    if abs(sj_start - 7574078) <= 5:
+                        print "TP53"
+                        print splicingMotifRegions
+                        print firstSearchRegion[1]
+
                 if "s" in junction1 and "*" in junction2: # splicing donor motif, minus direction
                     firstSearchRegion[2] = firstSearchRegion[2] + searchMargin1
                     splicingMotifRegions.append((F[header2ind["SJ_1"]], sj_end - donor_size_intron, sj_end + donor_size_exon - 1, "donor", "-", 0))
                 if "e" in junction1 and "*" in junction2: # # splicing acceptor motif, plus direction
                     firstSearchRegion[2] = firstSearchRegion[2] + searchMargin1
                     splicingMotifRegions.append((F[header2ind["SJ_1"]], sj_end - acceptor_size_intron, sj_end + acceptor_size_exon - 1, "acceptor", "+", 0))
+                """
+    
+                """
+                if abs(sj_start - 7574078) <= 5:
+                    print junction1
+                    print junction2
+                    print "*" in junction1
+                    print "e" in junction2
+                """
+
+                # for non exon-intron junction breakpoints
+                for i in range(0, len(gene1)):
+
+                    if junction1[i] == "*" and junction2[i] == "s": # splicing donor motif, plus direction
+                        firstSearchRegion[1] = sj_start - searchMargin1
+                        motif_start = sj_start - donor_size_exon + 1 - int(offset2[i])
+                        motif_end = sj_start + donor_size_intron - int(offset2[i])
+                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "donor", "+", 0))
+                    if junction1[i] == "*" and junction2[i] == "e": # splicing acceptor motif, minus direction
+                        firstSearchRegion[1] = sj_start - searchMargin1 
+                        motif_start = sj_start - acceptor_size_exon + 1 - int(offset2[i])
+                        motif_end = sj_start + acceptor_size_intron - int(offset2[i])
+                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "acceptor", "-", 0))
+                    if junction1[i] == "s" and junction2[i] == "*": # splicing donor motif, minus direction
+                        firstSearchRegion[2] = sj_end + searchMargin1
+                        motif_start = sj_end - donor_size_intron - int(offset1[i])
+                        motif_end = sj_end + donor_size_exon - 1 - int(offset1[i])
+                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "donor", "-", 0))
+                    if junction1[i] == "e" and junction2[i] == "*": # # splicing acceptor motif, plus direction
+                        firstSearchRegion[2] = sj_end + searchMargin1
+                        motif_start = sj_end - acceptor_size_intron - int(offset1[i])
+                        motif_end = sj_end + acceptor_size_exon - 1 - int(offset1[i])
+                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "acceptor", "+", 0))
 
 
             ##########

@@ -31,6 +31,7 @@ def spliced_coding_size(gene1, gene2, sj_chr, sj_start, sj_end, ref_coding_tb, e
                     coding_size = coding_size + int(record[2]) - int(record[1])
 
     return coding_size
+
  
 def annot_junction(input_file, output_file, annotation_dir, junction_margin, exon_margin):
 
@@ -89,8 +90,9 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
         line = hin.readline()
         F = line.rstrip('\n').split('\t')
         print >> hout, '\t'.join(["SJ_" + str(i) for i in range(1, len(F) + 1)]) + '\t' + \
-                       "Splicing_Class" + '\t' + "Is_Inframe" + '\t' + "Gene_1" + '\t' + "Exon_Num_1" + '\t' + "Is_Boundary_1" + '\t' + \
-                       "Gene_2" + '\t' + "Exon_Num_2" + '\t' + "Is_Boundary_2"
+                       "Splicing_Class" + '\t' + "Is_Inframe" + '\t' + "Gene_1" + '\t' + "Exon_Num_1" + '\t' + \
+                       "Is_Boundary_1" + '\t' + "Offset_1" + '\t' + "Gene_2" + '\t' + "Exon_Num_2" + '\t' + \
+                       "Is_Boundary_2" + '\t' + "Offset_2"
 
     with open(input_file, 'r') as hin:
         for line in hin:
@@ -147,13 +149,15 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
                 # print >> sys.stderr, '\t'.join(F)
                 tabixErrorFlag = 1
             
-            exon1 = {};
-            junction1 = {};
+            exon1 = {}
+            junction1 = {}
+            offset1 = {}
             if tabixErrorFlag == 0:
                 for record_line in records:
                     record = record_line.split('\t')
                     exon1[record[3]] = int(record[4])
                     if abs(sj_start - int(record[2])) < junction_margin:
+                        offset1[record[3]] = sj_start - int(record[2])
                         if record[5] == "+": junction1[record[3]] = "e"
                         if record[5] == "-": junction1[record[3]] = "s"
             ##########
@@ -168,13 +172,15 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
                 # print >> sys.stderr, '\t'.join(F)
                 tabixErrorFlag = 1
 
-            exon2 = {};
-            junction2 = {};
+            exon2 = {}
+            junction2 = {}
+            offset2 = {}
             if tabixErrorFlag == 0:
                 for record_line in records:
                     record = record_line.split('\t')
                     exon2[record[3]] = int(record[4])
                     if abs(sj_end - 1 - int(record[1])) < junction_margin:
+                        offset2[record[3]] = sj_end - 1 - int(record[1])
                         if record[5] == "+": junction2[record[3]] = "s"
                         if record[5] == "-": junction2[record[3]] = "e"
             ##########
@@ -344,6 +350,7 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
             geneInfo1 = []
             exonInfo1 = []
             junctionInfo1 = []
+            offsetInfo1 = []
             if len(gene1) > 0:
                 for g1 in gene1:
                     if g1 not in passGene: continue 
@@ -358,15 +365,21 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
                     else:
                         junctionInfo1.append("*")
 
-            else:
+                    if g1 in offset1:
+                        offsetInfo1.append(str(offset1[g1]))
+                    else:
+                        offsetInfo1.append("*")
+
+            if len(geneInfo1) == 0: 
                 geneInfo1.append("---")
                 exonInfo1.append("---")
                 junctionInfo1.append("---")
-
+                offsetInfo1.append("---")
 
             geneInfo2 = []
             exonInfo2 = []
             junctionInfo2 = []
+            offsetInfo2 = []
             if len(gene2) > 0:
                 for g2 in gene2:
                     if g2 not in passGene: continue
@@ -380,16 +393,21 @@ def annot_junction(input_file, output_file, annotation_dir, junction_margin, exo
                         junctionInfo2.append(junction2[g2])
                     else:
                         junctionInfo2.append("*")
-                        
-            else:
+
+                    if g2 in offset2:
+                        offsetInfo2.append(str(offset2[g2]))
+                    else:
+                        offsetInfo2.append("*")
+
+            if len(geneInfo2) == 0:
                 geneInfo2.append("---")
                 exonInfo2.append("---")
                 junctionInfo2.append("---")
-
+                offsetInfo2.append("---")
 
          
 
-            print >> hout, '\t'.join(F) + '\t' + spliceClass + '\t' + in_frame + '\t' + '\t'.join([';'.join(geneInfo1), ';'.join(exonInfo1), ';'.join(junctionInfo1), ';'.join(geneInfo2), ';'.join(exonInfo2), ';'.join(junctionInfo2)])
+            print >> hout, '\t'.join(F) + '\t' + spliceClass + '\t' + in_frame + '\t' + '\t'.join([';'.join(geneInfo1), ';'.join(exonInfo1), ';'.join(junctionInfo1), ';'.join(offsetInfo1), ';'.join(geneInfo2), ';'.join(exonInfo2), ';'.join(junctionInfo2), ';'.join(offsetInfo2)])
      
 
     hout.close()
