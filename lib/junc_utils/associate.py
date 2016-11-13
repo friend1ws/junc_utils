@@ -1,7 +1,8 @@
 #! /usr/bin/env python
 
 import sys
-import tabix
+# import tabix
+import pysam
 import numpy
 
 # this is deprecated!!!
@@ -229,7 +230,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
     acceptor_size_intron, acceptor_size_exon = [int(x) for x in acceptor_size.split(',')]
     branch_size_intron, branch_size_exon = [int(x) for x in branch_size.split(',')]
 
-    searchMargin1 = 50 
+    searchMargin1 = 100 
     searchMargin2 = 10
 
     splicingDonnorMotif = ["AG", "GTRAGT"]
@@ -249,9 +250,9 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
 
     hout = open(output_file, 'w')
 
-    mutation_tb = tabix.open(mutation_file)
-    exon_tb = tabix.open(ref_exon_bed)
-    if is_branchpoint: branch_tb = tabix.open(branchpoint_bed)
+    mutation_tb = pysam.TabixFile(mutation_file)
+    exon_tb = pysam.TabixFile(ref_exon_bed)
+    if is_branchpoint: branch_tb = pysam.TabixFile(branchpoint_bed)
 
     header2ind = {}
     with open(input_file, 'r') as hin:
@@ -356,20 +357,20 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
             # rough check for the mutation between the spliced region
             tabixErrorFlag1 = 0
             try:
-                mutations = mutation_tb.query(firstSearchRegion[0], firstSearchRegion[1], firstSearchRegion[2])
+                mutation_lines = mutation_tb.fetch(firstSearchRegion[0], firstSearchRegion[1], firstSearchRegion[2])
             except Exception as inst:
                 # print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
                 # print >> sys.stderr, '\t'.join(F)
                 tabixErrorFlag1 = 1
 
             # if there are some mutaions
-            if tabixErrorFlag1 == 0 and mutations is not None:
+            if tabixErrorFlag1 == 0 and mutation_lines is not None:
 
                 chr_name = grch2ucsc[F[header2ind["SJ_1"]]] if F[header2ind["SJ_1"]] in grch2ucsc else F[header2ind["SJ_1"]] 
                 # check the exons within the spliced regions
                 tabixErrorFlag2 = 0
                 try:
-                    exons = exon_tb.query(chr_name, firstSearchRegion[1], firstSearchRegion[2])
+                    exon_lines = exon_tb.fetch(chr_name, firstSearchRegion[1], firstSearchRegion[2])
                 except Exception as inst:
                     # print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
                     # print >> sys.stderr, '\t'.join(F)
@@ -377,7 +378,8 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
 
                 # first, add the exon-intron junction for detailed check region list
                 if tabixErrorFlag2 == 0:
-                    for exon in exons:
+                    for exon_line in exon_lines:
+                        exon = exon_line.split('\t')
                         if exon[3] not in targetGene: continue
                         if exon[5] == "+":
                             # splicing acceptor motif, plus direction
@@ -395,14 +397,15 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
                 if is_branchpoint:
                     tabixErrorFlag3 = 0
                     try:
-                        branches = branch_tb.query(chr_name, firstSearchRegion[1], firstSearchRegion[2])
+                        branche_lines = branch_tb.fetch(chr_name, firstSearchRegion[1], firstSearchRegion[2])
                     except Exception as inst:
                         print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
                         print >> sys.stderr, '\t'.join(F)
                         tabixErrorFlag3 = 3
 
                     if tabixErrorFlag3 == 0:
-                        for branch in branches:
+                        for branch_line in branche_lines:
+                            branch = branch_line.split('\t')
                             if branch[5] == "+":
                                 splicingMotifRegions.append((branch[0], int(branch[2]) - branch_size_intron, int(branch[2]) + branch_size_exon - 1, "branchpoint", "+", 1))
                             else:
@@ -412,7 +415,8 @@ def get_snv_junction2(input_file, output_file, mutation_file, annotation_dir, do
                 splicingMotifRegions = list(set(splicingMotifRegions))
 
                 # compare each mutation with exon-intron junction regions and non-exon-intorn junction breakpoints.
-                for mutation in mutations:
+                for mutation_line in mutation_lines:
+                    mutation = mutation_line.split('\t')
                     RegMut = []
                     for reg in splicingMotifRegions:
 
