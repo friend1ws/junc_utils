@@ -1,6 +1,6 @@
 #! /usr/bin/env python
 
-import sys
+import sys, gzip
 import pysam
 
 def convert_anno2vcf(input_file, output_file, reference):
@@ -103,7 +103,16 @@ def convert_genosv2bed(input_file, output_file):
 def proc_star_junction(input_file, output_file, control_file, read_num_thres, overhang_thres, remove_annotated, convert_map_splice2):
     
     is_control = True if control_file is not None else False
-    if is_control: control_db = pysam.TabixFile(control_file)
+    # if is_control: control_db = pysam.TabixFile(control_file)
+    
+    control_db = {}
+    if is_control:
+        with gzip.open(control_file, 'r') as hin:
+            for line in hin:
+                F = line.rstrip('\n').split('\t')
+                key = F[0] + '\t' + F[1] + '\t' + F[2]
+                control_db[key] = 1
+
 
     if read_num_thres is None: read_num_thres = 0
     if overhang_thres is None: overhang_thres = 0
@@ -118,9 +127,9 @@ def proc_star_junction(input_file, output_file, control_file, read_num_thres, ov
             if int(F[6]) < read_num_thres: continue
             if int(F[8]) < overhang_thres: continue
 
-            if F[1].startswith("2959542"):
-                pass
 
+            if key in control_db: continue
+            """
             ##########
             # remove control files
             if is_control:
@@ -141,6 +150,7 @@ def proc_star_junction(input_file, output_file, control_file, read_num_thres, ov
 
                 if control_flag == 1: continue
             ##########
+            """
 
             if convert_map_splice2:
                 # convert to map-splice2 coordinate

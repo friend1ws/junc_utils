@@ -145,7 +145,7 @@ def merge_control_main(args):
         os.makedirs(os.path.dirname(output_file))
 
     hin = open(input_file_list, 'r')
-    hout = open(output_file + ".unsroted", 'w')
+    hout = open(output_file + ".unsorted", 'w')
 
     with open(input_file_list, 'r') as hin:
         for line in hin:
@@ -167,7 +167,7 @@ def merge_control_main(args):
                 
 
     hout = open(output_file + ".sorted", 'w')
-    s_ret = subprocess.call(["sort", "-k1,1", "-k2,2n", "-k3,3n", output_file + ".unsroted"], stdout = hout)
+    s_ret = subprocess.call(["sort", "-k1,1", "-k2,2n", "-k3,3n", output_file + ".unsorted"], stdout = hout)
     hout.close()
 
     if s_ret != 0:
@@ -192,7 +192,9 @@ def merge_control_main(args):
             else:
                 temp_read_num.append(str(read_num))
 
-        print >> hout, temp_key + '\t' + ','.join(temp_read_num)
+        if temp_key != "":
+            if len(temp_read_num) >= sample_num_thres:
+                print >> hout, temp_key + '\t' + ','.join(temp_read_num)
 
 
 
