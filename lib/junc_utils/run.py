@@ -212,6 +212,6 @@ def merge_control_main(args):
         print >> sys.stderr, "Error in indexing merged junction file"
         sys.exit(1)
 
-    subprocess.call(["rm", "-f", output_file + ".unsroted"])
+    subprocess.call(["rm", "-f", output_file + ".unsorted"])
     subprocess.call(["rm", "-f", output_file + ".sorted"])
     subprocess.call(["rm", "-f", output_file + ".merged"])

@@ -202,7 +202,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                            (junction2[gene] == "e" and junction1[gene] == "s" and exon1[gene] - exon2[gene] > 1): 
                             passGene.append(gene)
 
-                            if spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
+                            sc_size = spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin)
+                            if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
                 if len(passGene) > 0: spliceClass = "exon-skip"
@@ -218,7 +219,9 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                         if (gene in junction1 and junction1[gene] == "e" and gene not in junction2 and gene in exon2) or \
                            (gene in junction2 and junction2[gene] == "e" and gene not in junction1 and gene in exon1):
                             passGene.append(gene)
-                            if spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
+
+                            sc_size = spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin)
+                            if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
                 if len(passGene) > 0: spliceClass = "alternative-3'-splice-site"
@@ -234,7 +237,9 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                         if (gene in junction1 and junction1[gene] == "s" and gene not in junction2 and gene in exon2) or \
                            (gene in junction2 and junction2[gene] == "s" and gene not in junction1 and gene in exon1):
                             passGene.append(gene)
-                            if spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
+
+                            sc_size = spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin)
+                            if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
             
                 if len(passGene) > 0: spliceClass = "alternative-5'-splice-site"
@@ -275,7 +280,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                         if exon1[gene] == exon2[gene]:
                             passGene.append(gene)
 
-                            if spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
+                            sc_size = spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin)
+                            if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
                 if len(passGene) > 0: spliceClass = "within-exon"
@@ -291,7 +297,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                         if gene in exon1 and gene in exon2:
                             passGene.append(gene)
 
-                            if spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
+                            sc_size = spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin)
+                            if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
      
                 if len(passGene) > 0: spliceClass = "exon-exon-junction"
@@ -317,7 +324,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                            (g1 in junction1 and junction1[g1] == "e" and g2 in junction2 and junction2[g2] == "s"): 
                             passGene.append(g1 + ',' + g2)
 
-                            if spliced_coding_size(g1, g2, chr_name, sj_start, sj_end, coding_tb, exon_margin) % 3 == 0:
+                            sc_size = spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin)
+                            if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
 
