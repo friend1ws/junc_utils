@@ -5,7 +5,7 @@ import argparse
 
 parser = argparse.ArgumentParser(prog = "junc_utils")
 
-parser.add_argument("--version", action = "version", version = "junc_utils-0.2.0")
+parser.add_argument("--version", action = "version", version = "junc_utils-0.3.0")
 
 subparsers = parser.add_subparsers()
 
@@ -153,6 +153,31 @@ merge_control.set_defaults(func = merge_control_main)
 
 
 ##########
+# exonization_pair
+exonization_pair = subparsers.add_parser("exonization_pair",
+                                      help = "get candidates for the other junction of an exonization supporting junction pair")
+
+exonization_pair.add_argument("half_exonizaiton_junction", metavar = "half_exonizaiton_junction", default = None, type = str,
+                              help = "a half of exonization junction pairs")
+
+exonization_pair.add_argument("junc_file", metavar = "sample.SJ.out.tab", default = None, type = str,
+                              help = "the path to star splicing junction file")
+
+exonization_pair.add_argument("output_file", metavar = "output_file", default = None, type = str,
+                              help = "the path to the output")
+
+exonization_pair.add_argument("--grc", default = False, action = 'store_true',
+                              help = "convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
+
+exonization_pair.add_argument("--genome_id", choices = ["hg19", "hg38", "mm10"], default = "hg19",
+                              help = "the genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
+
+exonization_pair.add_argument("--read_num_thres", type = int, default = 2,
+                              help = "remove splicing junctions whose supporting numbers are below this value (default: %(default)s)")
+
+exonization_pair.set_defaults(func = exonization_pair_main)
+##########
+
 
 args = parser.parse_args()
 

@@ -4,6 +4,7 @@ import os, subprocess
 import utils
 import annotate
 import associate
+import exonization_pair
 
 def filter_main(args):
 
@@ -215,3 +216,22 @@ def merge_control_main(args):
     subprocess.call(["rm", "-f", output_file + ".unsorted"])
     subprocess.call(["rm", "-f", output_file + ".sorted"])
     subprocess.call(["rm", "-f", output_file + ".merged"])
+
+
+
+def exonization_pair_main(args):
+
+    # investigate the input splicing junction
+    # 1. whether the both ends are located within the same gene
+    # 2. whether one of the ends is at the authentic splicing junction
+    # 3. whether one of the ends is located on intronic region
+    # 4. the opposite authentic splicing junction to the one of the ends of input splicing junction
+
+    exonization_info = exonization_pair.check_splicing_junction_for_exonization(args.half_exonizaiton_junction, args.output_file, args.genome_id, args.grc)
+
+    print exonization_info
+    exonization_pair.check_opposite_junction(args.junc_file, exonization_info, args.output_file)
+
+    # print exonization_info
+ 
+
