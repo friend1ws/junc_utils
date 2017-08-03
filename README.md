@@ -69,4 +69,13 @@ junc_utils associate [-h] [--grc] [--genome_id {hg19,hg38,mm10}]
                             output_file
 ```
 
+### exonization_pair
 
+get opposite splicing junction to an intronic alternative splice-site junction
+
+```
+junc_utils exonization_pair [-h] [--grc] [--genome_id {hg19,hg38,mm10}]
+                                   [--read_num_thres READ_NUM_THRES]
+                                   half_exonizaiton_junction sample.SJ.out.tab
+                                   output_file
+```
