@@ -175,6 +175,15 @@ exonization_pair.add_argument("--genome_id", choices = ["hg19", "hg38", "mm10"],
 exonization_pair.add_argument("--read_num_thres", type = int, default = 2,
                               help = "remove splicing junctions whose supporting numbers are below this value (default: %(default)s)")
 
+exonization_pair.add_argument("--min_new_intron_size", type = int, default = 30,
+                              help = "minimum new intron size")
+
+exonization_pair.add_argument("--max_new_exon_size", type = int, default = 500,
+                              help = "maximum new exon size")
+
+exonization_pair.add_argument("--boundary_margin", type = int, default = 3,
+                              help = "margin size when comparing splicing junctions with exon-intron boundaries")
+
 exonization_pair.set_defaults(func = exonization_pair_main)
 ##########
 

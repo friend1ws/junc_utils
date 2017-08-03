@@ -4,7 +4,7 @@ import sys, re, subprocess
 import annot_utils.gene, annot_utils.exon
 import pysam
 
-def check_splicing_junction_for_exonization(exonizaiton_junction, output_file, genome_id, is_grc):
+def check_splicing_junction_for_exonization(exonizaiton_junction, output_file, genome_id, is_grc, min_new_intron_size, boundary_margin):
 
     annot_utils.gene.make_gene_info(output_file + ".tmp.refGene.bed.gz", "refseq", genome_id, is_grc, True)
     annot_utils.exon.make_exon_info(output_file + ".tmp.refExon.bed.gz", "refseq", genome_id, is_grc, True)
@@ -51,24 +51,24 @@ def check_splicing_junction_for_exonization(exonizaiton_junction, output_file, g
                     for record_line2 in records2:
                         record2 = record_line2.split('\t')
                         if record2[3] == tgene and record2[5] == tstrand:
-                            tstarts.append(int(record2[1]))
-                            tends.append(int(record2[2]))
+                            tstarts.append(int(record2[1]) + 1) # the last exonic positions
+                            tends.append(int(record2[2])) # the first exonic positions
 
                     tstarts.sort()
                     tends.sort()
 
                     for i in range(len(tends) - 1):
-                        if abs(sstart - tends[i]) < 5 and send < tstarts[i + 1] - 100:
+                        if abs((sstart - 1) - tends[i]) <= boundary_margin and tstarts[i + 1] - (send + 1) - 1 >= min_new_intron_size:
                             if tstrand == '+':
-                                new_exon_info.append((schr, tends[i], tstarts[i + 1], send, '+', "acceptor"))
+                                new_exon_info.append((schr, tends[i], tstarts[i + 1], send + 1, '+', "acceptor"))
                             else:
-                                new_exon_info.append((schr, tends[i], tstarts[i + 1], send, '-', "donor"))
+                                new_exon_info.append((schr, tends[i], tstarts[i + 1], send + 1, '-', "donor"))
 
-                        if abs(send - tstarts[i + 1]) < 5 and sstart > tends[i] + 100:
+                        if abs((send + 1) - tstarts[i + 1]) <= boundary_margin and (sstart - 1) - tends[i] - 1 >= min_new_intron_size:
                             if tstrand == '+':
-                                new_exon_info.append((schr, tstarts[i + 1], tends[i], sstart, '+', "donor"))
+                                new_exon_info.append((schr, tstarts[i + 1], tends[i], sstart - 1, '+', "donor"))
                             else:
-                                new_exon_info.append((schr, tstarts[i + 1], tends[i], sstart, '-', "acceptor"))
+                                new_exon_info.append((schr, tstarts[i + 1], tends[i], sstart - 1, '-', "acceptor"))
 
 
     new_exon_info = list(set(new_exon_info))
@@ -82,7 +82,9 @@ def check_splicing_junction_for_exonization(exonizaiton_junction, output_file, g
 
 
 
-def check_opposite_junction(junc_file, exonization_info, output_file):
+def check_opposite_junction(junc_file, exonization_info, output_file, read_num_thres, max_new_exon_size, boundary_margin):
+
+    hout = open(output_file, 'w')
 
     with open(junc_file, 'r') as hin:
         for line in hin:
@@ -92,14 +94,16 @@ def check_opposite_junction(junc_file, exonization_info, output_file):
             for i in range(len(exonization_info)):
                 if (exonization_info[i][4] == '+' and exonization_info[i][5] == "acceptor") or \
                    (exonization_info[i][4] == '-' and exonization_info[i][5] == "donor"):
-                    if int(F[1]) > exonization_info[i][3] - 10 and int(F[1]) < exonization_info[i][3] + 500 and \
-                       abs(int(F[2]) - exonization_info[i][2]) < 5 and int(F[6]) >= 2:
-                        print '\t'.join(F)
+                    if int(F[1]) - 1 >= exonization_info[i][3] and int(F[1]) - 1 <= exonization_info[i][3] + max_new_exon_size and \
+                       abs(int(F[2]) + 1 - exonization_info[i][2]) <= boundary_margin and int(F[6]) >= read_num_thres:
+                        print >> hout, '\t'.join(F)
                 else:
-                    if int(F[2]) > exonization_info[i][3] - 500 and int(F[2]) < exonization_info[i][3] + 10 and \
-                        abs(int(F[1]) - exonization_info[i][2]) < 5 and int(F[6]) >= 2:
-                        print '\t'.join(F)
+                    if int(F[2]) +  1 >= exonization_info[i][3] - max_new_exon_size and int(F[2]) + 1 <= exonization_info[i][3] and \
+                        abs(int(F[1]) - 1 - exonization_info[i][2]) <= boundary_margin and int(F[6]) >= read_num_thres:
+                        print >> hout, '\t'.join(F)
  
+    hout.close()
+
 
 
 

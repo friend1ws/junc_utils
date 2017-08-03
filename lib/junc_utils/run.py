@@ -227,11 +227,13 @@ def exonization_pair_main(args):
     # 3. whether one of the ends is located on intronic region
     # 4. the opposite authentic splicing junction to the one of the ends of input splicing junction
 
-    exonization_info = exonization_pair.check_splicing_junction_for_exonization(args.half_exonizaiton_junction, args.output_file, args.genome_id, args.grc)
-
-    print exonization_info
-    exonization_pair.check_opposite_junction(args.junc_file, exonization_info, args.output_file)
+    # exonization_info = [chromosome, authentic exon-intron boundary, opposite exon-intron boundary, new splice site, strand, donor or acceptor]
+    exonization_info = exonization_pair.check_splicing_junction_for_exonization(args.half_exonizaiton_junction, args.output_file, 
+                         args.genome_id, args.grc, args.min_new_intron_size, args.boundary_margin)
 
     # print exonization_info
+    exonization_pair.check_opposite_junction(args.junc_file, exonization_info, args.output_file, 
+                                             args.read_num_thres, args.max_new_exon_size, args.boundary_margin)
+
  
 
