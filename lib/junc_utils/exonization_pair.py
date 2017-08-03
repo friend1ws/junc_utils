@@ -82,7 +82,10 @@ def check_splicing_junction_for_exonization(exonizaiton_junction, output_file, g
 
 
 
-def check_opposite_junction(junc_file, exonization_info, output_file, read_num_thres, max_new_exon_size, boundary_margin):
+def check_opposite_junction(junc_file, exonization_info, output_file, control_file, read_num_thres, max_new_exon_size, boundary_margin):
+
+    if control_file is not None:
+        control_db = pysam.TabixFile(control_file)
 
     hout = open(output_file, 'w')
 
@@ -91,17 +94,40 @@ def check_opposite_junction(junc_file, exonization_info, output_file, read_num_t
             F = line.rstrip('\n').split('\t')
             if F[0] != exonization_info[0][0]: continue
 
+            new_exon_flag = 0
             for i in range(len(exonization_info)):
                 if (exonization_info[i][4] == '+' and exonization_info[i][5] == "acceptor") or \
                    (exonization_info[i][4] == '-' and exonization_info[i][5] == "donor"):
                     if int(F[1]) - 1 >= exonization_info[i][3] and int(F[1]) - 1 <= exonization_info[i][3] + max_new_exon_size and \
                        abs(int(F[2]) + 1 - exonization_info[i][2]) <= boundary_margin and int(F[6]) >= read_num_thres:
-                        print >> hout, '\t'.join(F)
+                        new_exon_flag = 1
                 else:
                     if int(F[2]) +  1 >= exonization_info[i][3] - max_new_exon_size and int(F[2]) + 1 <= exonization_info[i][3] and \
                         abs(int(F[1]) - 1 - exonization_info[i][2]) <= boundary_margin and int(F[6]) >= read_num_thres:
-                        print >> hout, '\t'.join(F)
- 
+                        new_exon_flag = 1
+
+            if new_exon_flag == 1:
+
+                control_flag = 0
+                if control_file is not None:
+                    tabixErrorFlag = 0
+                    try:
+                        records = control_db.fetch(F[0], int(F[1]) - 5, int(F[1]) + 5)
+                    except Exception as inst:
+                        # prin >> sys.stderr, "%s: %s" % (type(inst), inst.args)
+                        # tabixErrorMsg = str(inst.args)
+                        tabixErrorFlag = 1
+
+                    if tabixErrorFlag == 0:
+                        for record_line in records:
+                            record = record_line.split('\t')
+                            if F[0] == record[0] and F[1] == record[1] and F[2] == record[2]:
+                                control_flag = 1
+
+                if control_flag == 0:
+                    print >> hout, '\t'.join(F)
+
+     
     hout.close()
 
 

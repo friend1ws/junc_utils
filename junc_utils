@@ -166,6 +166,9 @@ exonization_pair.add_argument("junc_file", metavar = "sample.SJ.out.tab", defaul
 exonization_pair.add_argument("output_file", metavar = "output_file", default = None, type = str,
                               help = "the path to the output")
 
+exonization_pair.add_argument("--control_file", default = None, type = str,
+                              help = "the path to control data created by junc_utils merge_control (default: %(default)s)")
+
 exonization_pair.add_argument("--grc", default = False, action = 'store_true',
                               help = "convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
 

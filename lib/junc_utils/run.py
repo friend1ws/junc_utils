@@ -232,7 +232,7 @@ def exonization_pair_main(args):
                          args.genome_id, args.grc, args.min_new_intron_size, args.boundary_margin)
 
     # print exonization_info
-    exonization_pair.check_opposite_junction(args.junc_file, exonization_info, args.output_file, 
+    exonization_pair.check_opposite_junction(args.junc_file, exonization_info, args.output_file, args.control_file,
                                              args.read_num_thres, args.max_new_exon_size, args.boundary_margin)
 
  
