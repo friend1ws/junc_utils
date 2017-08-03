@@ -74,8 +74,12 @@ junc_utils associate [-h] [--grc] [--genome_id {hg19,hg38,mm10}]
 get opposite splicing junction to an intronic alternative splice-site junction
 
 ```
-junc_utils exonization_pair [-h] [--grc] [--genome_id {hg19,hg38,mm10}]
+exonization_pair [-h] [--control_file CONTROL_FILE] [--grc]
+                                   [--genome_id {hg19,hg38,mm10}]
                                    [--read_num_thres READ_NUM_THRES]
+                                   [--min_new_intron_size MIN_NEW_INTRON_SIZE]
+                                   [--max_new_exon_size MAX_NEW_EXON_SIZE]
+                                   [--boundary_margin BOUNDARY_MARGIN]
                                    half_exonizaiton_junction sample.SJ.out.tab
-                                   output_file
+                                   output_file
 ```
