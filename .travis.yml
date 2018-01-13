@@ -13,3 +13,5 @@ before_script:
 
 script:
   - pip install .
+  - python setup.py test
+

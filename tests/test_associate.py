@@ -2,7 +2,7 @@
 
 import unittest
 import os, tempfile, shutil, filecmp
-import intron_retention_utils
+import junc_utils
 from check_download import *
 
 class TestAssociate(unittest.TestCase):
@@ -12,7 +12,7 @@ class TestAssociate(unittest.TestCase):
         check_download("https://storage.googleapis.com/friend1ws_package_data/common/GRCh37.fa", \
                        cur_dir + "/resource/reference_genome/GRCh37.fa")
 
-        self.parser = intron_retention_utils.parser.create_parser()
+        self.parser = junc_utils.parser.create_parser()
 
 
     def tearDown(self):
