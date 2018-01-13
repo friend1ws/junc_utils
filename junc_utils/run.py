@@ -25,7 +25,7 @@ def associate_main(args):
     # control_file = args.ctrl
     is_sv = True if args.sv else False
     is_debug = True if args.debug else False 
-    reference_genome = args.reference_genome
+    reference_genome = args.reference
 
 
     output_dir = os.path.dirname(output_file)

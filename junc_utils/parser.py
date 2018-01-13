@@ -96,7 +96,7 @@ def create_parser():
     associate.add_argument("--acceptor_size", metavar = "acceptor_size", default = "6,1", type = str,
                            help = "splicing donor site size (intronic region size, exonic region size) (default: %(default)s)")
 
-    associate.add_argument("--reference_genome", metavar = "reference.fa", type = str,
+    associate.add_argument("--reference", metavar = "reference.fa", type = str,
                            help = "the path to the reference genomoe sequence (necessary for anno format)")
 
     associate.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
