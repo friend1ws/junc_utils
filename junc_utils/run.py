@@ -230,10 +230,14 @@ def exonization_pair_main(args):
     # exonization_info = [chromosome, authentic exon-intron boundary, opposite exon-intron boundary, new splice site, strand, donor or acceptor]
     exonization_info = exonization_pair.check_splicing_junction_for_exonization(args.half_exonizaiton_junction, args.output_file, 
                          args.genome_id, args.grc, args.min_new_intron_size, args.boundary_margin)
-
+    
     # print exonization_info
-    exonization_pair.check_opposite_junction(args.junc_file, exonization_info, args.output_file, args.control_file,
-                                             args.read_num_thres, args.max_new_exon_size, args.boundary_margin)
+
+    if len(exonization_info) == 0: 
+        open(args.output_file, 'a').close()
+    else:
+        exonization_pair.check_opposite_junction(args.junc_file, exonization_info, args.output_file, args.control_file,
+                                                 args.read_num_thres, args.max_new_exon_size, args.boundary_margin)
 
  
 

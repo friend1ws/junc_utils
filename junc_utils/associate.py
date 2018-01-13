@@ -249,9 +249,9 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
             print >> sys.stderr, "branchpoint can be used only for hg19"
             sys.exit(1)
         if is_grc:
-            branchpoint_bed = pkg_resources.resource_filename("annot_utils", "data/hg19/branchpoint_mercer.grc.bed.gz")
+            branchpoint_bed = pkg_resources.resource_filename("annot_utils", "data/hg19/branchpoint_signal.grc.bed.gz")
         else:
-            branchpoint_bed = pkg_resources.resource_filename("annot_utils", "data/hg19/branchpoint_mercer.bed.gz")
+            branchpoint_bed = pkg_resources.resource_filename("annot_utils", "data/hg19/branchpoint_signal.bed.gz")
         branch_tb = pysam.TabixFile(branchpoint_bed)
 
     header2ind = {}
@@ -413,8 +413,22 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                                     else: # insertion
                                         if indel_start == canonical_start_pos + 1:
                                             is_canonical = "canonical"
+
+                                # branch point
                                 else:
+                                    if reg[4] == "+": canonical_start_pos = reg[2] - branch_size_exon + 1
+                                    if reg[4] == "-": canonical_start_pos = reg[1] + branch_size_exon - 1
+ 
                                     is_canonical = "non-canonical"
+                                    if len(mutation[3]) > 1: # deletion
+                                        if indel_start <= canonical_start_pos and canonical_start_pos <= indel_end:
+                                            is_canonical = "canonical"
+                                    else: # insertion
+                                        pass
+
+
+
+
 
                                 if reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
                                 if reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
@@ -425,6 +439,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                             if reg[3] == "acceptor": motifSeq = splicingAcceptorMotif[0] + splicingAcceptorMotif[1]                  
                             if reg[3] == "donor": motifSeq = splicingDonnorMotif[0] + splicingDonnorMotif[1]
 
+                            is_canonical = "non-canonical"
                             if reg[3] in ["acceptor", "donor"]:
                                 if reg[3] == "acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
                                 if reg[3] == "acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
@@ -432,8 +447,14 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                                 if reg[3] == "donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
 
                                 is_canonical = "canonical" if canonical_start_pos <= int(mutation[1]) <= canonical_start_pos + 1 else "non-canonical"
+
+                            # branchpoint 
                             else:
-                                is_canonical = "non-canonical"                
+                                if reg[4] == "+": canonical_start_pos = reg[2] - branch_size_exon + 1 
+                                if reg[4] == "-": canonical_start_pos = reg[1] + branch_size_exon - 1 
+
+                                is_canonical = "canonical" if canonical_start_pos == int(mutation[1]) else "non-canonical"
+
 
                             if reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
                             if reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
