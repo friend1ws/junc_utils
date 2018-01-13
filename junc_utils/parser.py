@@ -90,10 +90,10 @@ def create_parser():
     associate.add_argument("--genome_id", choices = ["hg19", "hg38", "mm10"], default = "hg19",
                            help = "the genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
 
-    associate.add_argument("--donor_size", metavar = "donor_size", default = "2,8", type = str,
+    associate.add_argument("--donor_size", metavar = "donor_size", default = "3,6", type = str,
                            help = "splicing donor site size (exonic region size, intronic region size) (default: %(default)s)")
 
-    associate.add_argument("--acceptor_size", metavar = "acceptor_size", default = "8,2", type = str,
+    associate.add_argument("--acceptor_size", metavar = "acceptor_size", default = "6,1", type = str,
                            help = "splicing donor site size (intronic region size, exonic region size) (default: %(default)s)")
 
     associate.add_argument("--reference_genome", metavar = "reference.fa", type = str,
