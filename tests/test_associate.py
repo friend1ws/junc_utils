@@ -31,7 +31,7 @@ class TestAssociate(unittest.TestCase):
         answer_file = cur_dir + "/data/associate/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
  
         args = self.parser.parse_args(["associate", annotated_sj_file, mutation_file, output_file, \
-                                       "--mutation_format", "anno", "--reference", ref_genome])
+                                       "--grc", "--mutation_format", "anno", "--reference", ref_genome])
         args.func(args)
 
         self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
