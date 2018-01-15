@@ -2,9 +2,6 @@
 
 import os, subprocess
 import utils
-import annotate
-import associate
-import exonization_pair
 
 def filter_main(args):
 
@@ -13,11 +10,14 @@ def filter_main(args):
 
 
 def annotate_main(args):
-    
-    # annotate.annot_junction(args.junc_file, args.output_path, args.annotation_dir, args.junction_margin, args.exon_margin)
-    annotate.annot_junction(args.junc_file, args.output_path, args.junction_margin, args.exon_margin, args.genome_id, args.grc)
+   
+    import annotate2 
+    annotate2.annot_junction(args.junc_file, args.output_path, args.junction_margin, args.exon_margin, args.genome_id, args.grc)
+
 
 def associate_main(args):
+
+    import associate
 
     mutation_file = args.mutation_file
     output_file = args.output_file
@@ -228,6 +228,9 @@ def exonization_pair_main(args):
     # 4. the opposite authentic splicing junction to the one of the ends of input splicing junction
 
     # exonization_info = [chromosome, authentic exon-intron boundary, opposite exon-intron boundary, new splice site, strand, donor or acceptor]
+
+    import exonization_pair
+
     exonization_info = exonization_pair.check_splicing_junction_for_exonization(args.half_exonizaiton_junction, args.output_file, 
                          args.genome_id, args.grc, args.min_new_intron_size, args.boundary_margin)
     

@@ -8,7 +8,7 @@ def spliced_coding_size(gene1, gene2, sj_chr, sj_start, sj_end, ref_coding_tb, e
 
     tabixErrorFlag = 0
     try:
-        records = ref_coding_tb.fetch(sj_chr, sj_start - exon_margin, sj_end + exon_margin)
+        records = ref_coding_tb.fetch(sj_chr, sj_start - exon_margin - 1, sj_end + exon_margin)
     except Exception as inst:
         tabixErrorFlag = 1
 
@@ -97,7 +97,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             # check gene annotation for the side 1  
             tabixErrorFlag = 0
             try:
-                records = gene_tb.fetch(chr_name, sj_start - 1, sj_start + 1)
+                records = gene_tb.fetch(chr_name, sj_start - 1, sj_start)
             except Exception as inst:
                 # print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
                 # print >> sys.stderr, '\t'.join(F)
@@ -116,7 +116,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             # check gene annotation for the side 2  
             tabixErrorFlag = 0
             try:
-                records = gene_tb.fetch(chr_name, sj_end - 1, sj_end + 1)
+                records = gene_tb.fetch(chr_name, sj_end - 1, sj_end)
             except Exception as inst:
                 # print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
                 # print >> sys.stderr, '\t'.join(F)
@@ -135,7 +135,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             # check exon and junction annotation for the side 1  
             tabixErrorFlag = 0
             try:
-                records = exon_tb.fetch(chr_name, sj_start - exon_margin, sj_start + exon_margin)
+                records = exon_tb.fetch(chr_name, sj_start - exon_margin - 1, sj_start + exon_margin)
             except Exception as inst:
                 # print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
                 # print >> sys.stderr, '\t'.join(F)
@@ -158,7 +158,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             # check exon and junction annotation for the side 2
             tabixErrorFlag = 0
             try:
-                records = exon_tb.fetch(chr_name, sj_end - exon_margin, sj_end + exon_margin)
+                records = exon_tb.fetch(chr_name, sj_end - exon_margin - 1, sj_end + exon_margin)
             except Exception as inst:
                 # print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
                 # print >> sys.stderr, '\t'.join(F)
@@ -324,10 +324,11 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                            (g1 in junction1 and junction1[g1] == "e" and g2 in junction2 and junction2[g2] == "s"): 
                             passGene.append(g1 + ',' + g2)
 
+                            """
                             sc_size = spliced_coding_size(gene, None, chr_name, sj_start, sj_end, coding_tb, exon_margin)
                             if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
-
+                            """
 
                 if len(passGene) > 0: spliceClass = "spliced-chimera"
                 if len(inframe_gene) > 0: in_frame = "in-frame"
@@ -352,7 +353,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             junctionInfo1 = []
             offsetInfo1 = []
             if len(gene1) > 0:
-                for g1 in gene1:
+                for g1 in sorted(gene1):
                     if g1 not in passGene: continue 
                     geneInfo1.append(g1)
                     if g1 in exon1: 
@@ -381,7 +382,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             junctionInfo2 = []
             offsetInfo2 = []
             if len(gene2) > 0:
-                for g2 in gene2:
+                for g2 in sorted(gene2):
                     if g2 not in passGene: continue
                     geneInfo2.append(g2)
                     if g2 in exon2:
