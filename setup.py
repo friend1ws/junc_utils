@@ -11,7 +11,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name = 'junc_utils',
-    version = '0.3.0b1',
+    version = '0.3.0',
     description='Python programs for analyzing splicing junctions',
     url = 'https://github.com/friend1ws/junc_utils',
     author = 'Yuichi Shiraishi',

@@ -7,7 +7,7 @@ def create_parser():
 
     parser = argparse.ArgumentParser(prog = "junc_utils")
 
-    parser.add_argument("--version", action = "version", version = "junc_utils-0.3.0b1")
+    parser.add_argument("--version", action = "version", version = "junc_utils-0.3.0")
 
     subparsers = parser.add_subparsers()
 
