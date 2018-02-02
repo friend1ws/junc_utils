@@ -16,8 +16,14 @@ Python (>= 2.7), pysam, [annot_utils](https://github.com/friend1ws/annot_utils) 
 ## Install
 
 ```
-git clone https://github.com/friend1ws/junc_utils.git
-cd junc_utils
+pip install junc_utils
+```
+
+Alternatively, you can install from the source code
+```
+wget https://github.com/friend1ws/junc_utils/archive/v0.3.0.tar.gz
+tar zxvf v0.3.0.tar.gz
+cd junc_utils-0.3.0
 python setup.py build install
 ```
 
