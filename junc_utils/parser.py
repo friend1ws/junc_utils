@@ -153,6 +153,8 @@ def create_parser():
 
     merge_control.set_defaults(func = merge_control_main)
 
+    """
+    # temporary remove this function, but want to recover in near future (2018/02/02)
     ##########
     # exonization_pair
     exonization_pair = subparsers.add_parser("exonization_pair",
@@ -190,6 +192,7 @@ def create_parser():
 
     exonization_pair.set_defaults(func = exonization_pair_main)
     ##########
+    """
 
     return parser
 
