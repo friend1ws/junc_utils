@@ -30,6 +30,25 @@ class TestFilter(unittest.TestCase):
 
         shutil.rmtree(tmp_dir)
 
+
+    def test2(self):
+
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+        tmp_dir = tempfile.mkdtemp()
+
+        input_file = cur_dir + "/data/CCLE-GSU-RNA-08.SJ.out.tab"
+        output_file = tmp_dir + "/CCLE-GSU-RNA-08.SJ.out.filter.tab"
+        answer_file = cur_dir + "/data/filter/CCLE-GSU-RNA-08.SJ.out.filter.tab"
+
+        args = self.parser.parse_args(["filter", input_file, output_file])
+        args.func(args)
+
+        self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
+
+        shutil.rmtree(tmp_dir)
+
+
+
 if __name__ == "__main__":
     unittest.main()
 

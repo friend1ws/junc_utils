@@ -529,31 +529,25 @@ def get_snv_junction_only_dist(input_file, output_file, mutation_file, annotatio
 
     hout.close()
 
+def get_sv_junction(input_file, output_file, sv_file, genome_id, is_grc):
+# def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
 
-def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
+    from collections import namedtuple
+    SV = namedtuple('SV', ('chr1', 'pos1', 'dir1', 'chr2', 'pos2', 'dir2', 'inseq', 'sv_type'))
 
     """
-        a script for detecting candidate structural variations (currently just deletions causing splicing changes
-        
+        a script for detecting candidate structural variations (currently just deletions causing splicing changes)
     """
 
     sv_comp_margin = 20
     exon_comp_margin = 10
 
 
-    ref_exon_bed = annotation_dir + "/refExon.bed.gz"
-    grch2ucsc_file = annotation_dir + "/grch2ucsc.txt"
-
-    # relationship between CRCh and UCSC chromosome names
-    grch2ucsc = {}
-    with open(grch2ucsc_file, 'r') as hin:
-        for line in hin:
-            F = line.rstrip('\n').split('\t')
-            grch2ucsc[F[0]] = F[1]
-
     hout = open(output_file, 'w')
-    mutation_tb = tabix.open(mutation_file)
-    exon_tb = tabix.open(ref_exon_bed)
+
+    sv_tb = pysam.TabixFile(sv_file)
+    # annot_utils.exon.make_exon_info(output_file + ".tmp.refExon.bed.gz", "refseq", genome_id, is_grc, True)
+    # exon_tb = pysam.TabixFile(output_file + ".tmp.refExon.bed.gz")
 
     header2ind = {}
     with open(input_file, 'r') as hin:
@@ -570,9 +564,7 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
         for line in hin:
             F = line.rstrip('\n').split('\t')
 
-
-            # if F[3] not in ["within-gene", "exon-skip", "exon-exon-junction", "spliced-chimera", "unspliced-chimera"]: continue
-
+            sj_chr = F[header2ind["SJ_1"]]
             sj_start = int(F[header2ind["SJ_2"]]) - 1
             sj_end = int(F[header2ind["SJ_3"]]) + 1
 
@@ -591,31 +583,28 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
             targetGene = list(set(targetGene))
             """
 
-            mutation_sv = []
+            associated_sv_list = []
             ##########
             # rough check for the mutation between the spliced region
             tabixErrorFlag1 = 0
             try:
-                mutations = mutation_tb.query(F[header2ind["SJ_1"]], sj_start - sv_comp_margin, sj_end + sv_comp_margin)
-            except Exception as inst:
+                sv_list = sv_tb.fetch(sj_chr, sj_start - sv_comp_margin, sj_end + sv_comp_margin)
+            except ValueError as inst:
                 # print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
-                # print >> sys.stderr, '\t'.join(F)
                 tabixErrorFlag1 = 1
 
             # if there are some mutaions
-            if tabixErrorFlag1 == 0 and mutations is not None:
+            if tabixErrorFlag1 == 0 and sv_list is not None:
         
-                for mutation in mutations:
+                for sv_cur in sv_list:
 
-                    """
-                    # the SV should be deletion and the SV should be confied within spliced junction
-                    if mutation[8] == '+' and mutation[9] == '-' and mutation[0] == F[0] and mutation[3] == F[0] and \
-                      sj_start - sv_comp_margin <= int(mutation[2]) and int(mutation[5]) <= sj_end + sv_comp_margin:
-                    """
+                    sv_curs = sv_cur.split('\t')
+                    SV_cur = SV(chr1 = sv_curs[3], pos1 = int(sv_curs[4]), dir1 = sv_curs[5], chr2 = sv_curs[6], pos2 = int(sv_curs[7]), dir2 = sv_curs[8], inseq = sv_curs[9], sv_type = sv_curs[10])
+                    
 
                     # the SV should be deletion, tandem duplication or confied within spliced junction
-                    if  mutation[0] == F[0] and mutation[3] == F[0] and \
-                      sj_start - sv_comp_margin <= int(mutation[2]) and int(mutation[5]) <= sj_end + sv_comp_margin:
+                    if  SV_cur.chr1 == sj_chr and SV_cur.chr2 == sj_chr and \
+                      sj_start - sv_comp_margin <= SV_cur.pos1 and SV_cur.pos2 <= sj_end + sv_comp_margin:
 
                         """ 
                         # the splicing junction should be shared by SV breakpoint or exon-intron junction
@@ -636,25 +625,20 @@ def get_sv_junction(input_file, output_file, mutation_file, annotation_dir):
                         if F[header2ind["Splicing_Class"]] in ["exon-skip", "alternative-3'-splice-site", "alternative-5'-splice-site",
                                                                "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]:
 
-                            mutation_sv.append('\t'.join(mutation))
-                        elif abs(sj_start - int(mutation[2])) <= sv_comp_margin and abs(sj_end - int(mutation[5])) <= sv_comp_margin:
-                            mutation_sv.append('\t'.join(mutation))
+                            associated_sv_list.append(SV_cur)
+                        elif abs(sj_start - SV_cur.pos1) <= sv_comp_margin and abs(sj_end - SV_cur.pos2) <= sv_comp_margin:
+                            associated_sv_list.append(SV_cur)
 
                             
 
-            for mutation in mutation_sv:
-                muts = mutation.split('\t')
+            for SV_cur in associated_sv_list:
 
-                sv_type = "inversion"
-                if muts[8] == "+" and muts[9] == "-": sv_type = "deletion"
-                if muts[8] == "-" and muts[9] == "+": sv_type = "tandem_duplication"
+                junc_to_dist1 = SV_cur.pos1 - sj_start
+                junc_to_dist2 = sj_end - SV_cur.pos2
 
-                junc_to_dist1 = int(muts[2]) - sj_start
-                junc_to_dist2 = sj_end - int(muts[5])
+                sv_key = ','.join([SV_cur.chr1, str(SV_cur.pos1), SV_cur.dir1, SV_cur.chr2, str(SV_cur.pos2), SV_cur.dir2, SV_cur.inseq])
 
-                print >> hout, '\t'.join(F) + '\t' + muts[0] + ',' + muts[2] + ',' + muts[8] + ',' + \
-                                                     muts[3] + ',' + muts[5] + ',' + muts[9] + ',' + muts[7] + '\t' + \
-                                                     sv_type + '\t' + str(junc_to_dist1) + '\t' + str(junc_to_dist2)
+                print >> hout, '\t'.join(F) + '\t' + sv_key + '\t' + SV_cur.sv_type + '\t' + str(junc_to_dist1) + '\t' + str(junc_to_dist2)
 
     hout.close()
 
