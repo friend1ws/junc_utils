@@ -114,7 +114,7 @@ def associate_main(args):
         associate.get_sv_junction(args.annotated_junction_file,
                                   output_file,
                                   output_file + ".mutran_tmp.bedpe.gz",               
-                                  args.annotation_dir)
+                                  args.genome_id, args.grc)
     ##########
 
     if is_debug != True:

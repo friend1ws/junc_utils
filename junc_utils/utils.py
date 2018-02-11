@@ -88,14 +88,17 @@ def convert_genosv2bed(input_file, output_file):
             F = line.rstrip('\n').split('\t')
             if F[0].startswith('#'): continue
             if F[0] == "Chr_1" and F[1] == "Pos_1": continue
-            chr1, chr2 = F[0], F[3]
-            start1, end1 = str(int(F[1]) - 1), F[1]
-            start2, end2 = str(int(F[4]) - 1), F[4]
-            dir1, dir2 = F[2], F[5]
-            name = "SV_" + str(num)
-            inseq = F[6] 
+            chr1, pos1, dir1, chr2, pos2, dir2, inseq, sv_type = F[0], F[1], F[2], F[3], F[4], F[5], F[6], F[7]
 
-            print >> hout, '\t'.join([chr1, start1, end1, chr2, start2, end2, name, inseq, dir1, dir2])
+            if chr1 != chr2: continue
+            print >> hout, '\t'.join([chr1, str(int(pos1) - 1), pos2, chr1, pos1, dir1, chr2, pos2, dir2, inseq, sv_type]) 
+            # start1, end1 = str(int(F[1]) - 1), F[1]
+            # start2, end2 = str(int(F[4]) - 1), F[4]
+            # dir1, dir2 = F[2], F[5]
+            # name = "SV_" + str(num)
+            # inseq = F[6] 
+
+            # print >> hout, '\t'.join([chr1, start1, end1, chr2, start2, end2, name, inseq, dir1, dir2])
 
     hout.close()
 
