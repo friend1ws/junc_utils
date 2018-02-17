@@ -1,9 +1,7 @@
 #! /usr/bin/env python
 
 import sys, subprocess, pkg_resources
-# import tabix
 import pysam
-import numpy
 import annot_utils.exon
 
 # this is deprecated!!!
@@ -600,9 +598,10 @@ def get_sv_junction(input_file, output_file, sv_file, genome_id, is_grc):
 
                     sv_curs = sv_cur.split('\t')
                     SV_cur = SV(chr1 = sv_curs[3], pos1 = int(sv_curs[4]), dir1 = sv_curs[5], chr2 = sv_curs[6], pos2 = int(sv_curs[7]), dir2 = sv_curs[8], inseq = sv_curs[9], sv_type = sv_curs[10])
-                    
+                    if SV_cur.sv_type != "deletion": continue # For now, we just consider deletion
+            
 
-                    # the SV should be deletion, tandem duplication or confied within spliced junction
+                    # the SV should be deletion confied within spliced junction
                     if  SV_cur.chr1 == sj_chr and SV_cur.chr2 == sj_chr and \
                       sj_start - sv_comp_margin <= SV_cur.pos1 and SV_cur.pos2 <= sj_end + sv_comp_margin:
 
