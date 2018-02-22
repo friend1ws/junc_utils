@@ -54,6 +54,8 @@ class TestAssociate(unittest.TestCase):
                                        "--grc", "--sv"])
         args.func(args)
 
+        print tmp_dir
+        print output_file
         self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
 
         shutil.rmtree(tmp_dir)

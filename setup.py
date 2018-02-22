@@ -3,15 +3,24 @@
 from setuptools import setup, find_packages
 from codecs import open
 from os import path
-
+ 
 here = path.abspath(path.dirname(__file__))
 
 with open(path.join(here, 'README.md'), encoding='utf-8') as f:
     long_description = f.read()
 
+def get_version():
+    with open(path.join(here, "junc_utils/version.py"), encoding = 'utf-8') as hin:
+        for line in hin:
+            if line.startswith("__version__"):
+                version = line.partition('=')[2]
+                return version.strip().strip('\'"')
+    raise ValueError('Could not find version.')
+        
+    
 setup(
     name = 'junc_utils',
-    version = '0.3.1b1',
+    version = get_version(),
     description='Python programs for analyzing splicing junctions',
     url = 'https://github.com/friend1ws/junc_utils',
     author = 'Yuichi Shiraishi',

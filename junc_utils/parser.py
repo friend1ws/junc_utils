@@ -2,12 +2,13 @@
 
 from run import *
 import argparse
+from version import __version__
 
 def create_parser():
 
     parser = argparse.ArgumentParser(prog = "junc_utils")
 
-    parser.add_argument("--version", action = "version", version = "junc_utils-0.3.1b1")
+    parser.add_argument("--version", action = "version", version = __version__)
 
     subparsers = parser.add_subparsers()
 
