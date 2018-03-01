@@ -44,6 +44,25 @@ class TestAssociate(unittest.TestCase):
         cur_dir = os.path.dirname(os.path.abspath(__file__))
         tmp_dir = tempfile.mkdtemp()
 
+        annotated_sj_file = cur_dir + "/data/annotate/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.tab"
+        mutation_file = cur_dir + "/data/mutation/CCLE-HCC1143-DNA-08.genomon_mutation.result.vcf"
+        output_file = tmp_dir + "/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
+        ref_genome = cur_dir + "/resource/reference_genome/GRCh37.fa"
+        answer_file = cur_dir + "/data/associate/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
+
+        args = self.parser.parse_args(["associate", annotated_sj_file, mutation_file, output_file, "--grc"])
+        args.func(args)
+
+        self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
+
+        shutil.rmtree(tmp_dir)
+
+
+    def test3(self):
+
+        cur_dir = os.path.dirname(os.path.abspath(__file__))
+        tmp_dir = tempfile.mkdtemp()
+
         annotated_sj_file = cur_dir + "/data/annotate/CCLE-GSU-RNA-08.SJ.out.filter.annotate.tab"
         mutation_file = cur_dir + "/data/sv/CCLE-GSU-DNA-08.genomonSV.result.filt.txt"
         output_file = tmp_dir + "/CCLE-GSU-DNA-08.SJ.out.filter.annotate.associate.tab"

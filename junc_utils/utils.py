@@ -3,7 +3,7 @@
 import sys, gzip
 import pysam
 
-def convert_anno2vcf(input_file, output_file, reference):
+def convert_anno2vcf(input_file, output_file, reference, header = False):
 
     """
         convert annovar format to vcf format
@@ -27,8 +27,11 @@ def convert_anno2vcf(input_file, output_file, reference):
     # print "##INFO=<ID=ND,Number=1,Type=Integer,Description=\"Normal Depth\">"
     # print "##INFO=<ID=NV,Number=1,Type=Integer,Description=\"Normal Variant Read Num\">"
     print >> hout, "##INFO=<ID=SOMATIC,Number=0,Type=Flag,Description=\"Somatic Variation\">"
-    print >> hout, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT"
     """
+
+    if header == True:
+        print >> hout, "##fileformat=#VFCv4.1"
+        print >> hout, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT"
 
     for line in hin:
         F = line.rstrip('\n').split('\t')

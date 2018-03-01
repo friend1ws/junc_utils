@@ -11,8 +11,8 @@ def filter_main(args):
 
 def annotate_main(args):
    
-    import annotate2 
-    annotate2.annot_junction(args.junc_file, args.output_path, args.junction_margin, args.exon_margin, args.genome_id, args.grc)
+    import annotate 
+    annotate.annot_junction(args.junc_file, args.output_path, args.junction_margin, args.exon_margin, args.genome_id, args.grc)
 
 
 def associate_main(args):
