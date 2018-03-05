@@ -21,12 +21,16 @@ def associate_main(args):
 
     mutation_file = args.mutation_file
     output_file = args.output_file
-    is_anno = True if args.mutation_format == "anno" else False
+    # is_anno = True if args.mutation_format == "anno" else False
+    is_anno = False if mutation_file.endswith(".vcf") or mutation_file.endswith(".vcf.gz") else True 
     # control_file = args.ctrl
     is_sv = True if args.sv else False
     is_debug = True if args.debug else False 
     reference_genome = args.reference
 
+    if not is_sv and is_anno and reference_genome is None:
+        print >> sys.stderr, "When the mutation file format is annovar format, reference genome should be specified"
+        sys.exit(1)
 
     output_dir = os.path.dirname(output_file)
     if output_dir != "" and not os.path.exists(output_dir):

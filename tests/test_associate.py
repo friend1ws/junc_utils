@@ -29,9 +29,9 @@ class TestAssociate(unittest.TestCase):
         output_file = tmp_dir + "/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
         ref_genome = cur_dir + "/resource/reference_genome/GRCh37.fa"
         answer_file = cur_dir + "/data/associate/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
- 
+
         args = self.parser.parse_args(["associate", annotated_sj_file, mutation_file, output_file, \
-                                       "--grc", "--mutation_format", "anno", "--reference", ref_genome])
+                                       "--grc", "--reference", ref_genome])
         args.func(args)
 
         self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
@@ -47,7 +47,6 @@ class TestAssociate(unittest.TestCase):
         annotated_sj_file = cur_dir + "/data/annotate/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.tab"
         mutation_file = cur_dir + "/data/mutation/CCLE-HCC1143-DNA-08.genomon_mutation.result.vcf"
         output_file = tmp_dir + "/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
-        ref_genome = cur_dir + "/resource/reference_genome/GRCh37.fa"
         answer_file = cur_dir + "/data/associate/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
 
         args = self.parser.parse_args(["associate", annotated_sj_file, mutation_file, output_file, "--grc"])

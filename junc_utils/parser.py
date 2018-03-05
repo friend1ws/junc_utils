@@ -103,7 +103,7 @@ def create_parser():
     associate.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
 
     associate.add_argument("--mutation_format", choices=["vcf", "anno"], default = "vcf",
-                           help = "the format of mutation file vcf or annovar (tsv) format")
+                           help = "Deprecated. This is not used any more. The format of mutation file vcf or annovar (tsv) format")
 
     # associate.add_argument("--is_edit_dist", default = False, action = 'store_true', 
     #                        help = "for SNV, only extract those changing edit distance to splicing motifs in consistent manners")
