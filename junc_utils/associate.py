@@ -64,8 +64,8 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
             sj_start = int(F[header2ind["SJ_2"]]) - 1
             sj_end = int(F[header2ind["SJ_3"]]) + 1
 
-            if F[header2ind["Splicing_Class"]] not in ["exon-skip", "alternative-3'-splice-site", "alternative-5'-splice-site",
-                                                       "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]: continue
+            if F[header2ind["Splicing_Class"]] not in ["Exon skipping", "Alternative 3'SS", "Alternative 5'SS",
+                                                       "Intronic alternative 3'SS", "Intronic alternative 5'SS"]: continue
 
             firstSearchRegion = [F[header2ind["SJ_1"]], sj_start, sj_end]
             splicingMotifRegions = []
@@ -89,8 +89,8 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
             targetGene = list(set(targetGene))
 
 
-            if F[header2ind["Splicing_Class"]] in ["alternative-3'-splice-site", "alternative-5'-splice-site",
-                                                   "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]:
+            if F[header2ind["Splicing_Class"]] in ["Alternative 3'SS", "Alternative 5'SS",
+                                                   "Intronic alternative 3'SS", "Intronic alternative 5'SS"]:
 
                 # for non exon-intron junction breakpoints
                 for i in range(0, len(gene1)):
@@ -99,22 +99,22 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                         firstSearchRegion[1] = sj_start - searchMargin1
                         motif_start = sj_start - donor_size_exon + 1 - int(offset2[i])
                         motif_end = sj_start + donor_size_intron - int(offset2[i])
-                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "donor", "+", 0))
+                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "Donor", "+", 0))
                     if junction1[i] == "*" and junction2[i] == "e": # splicing acceptor motif, minus direction
                         firstSearchRegion[1] = sj_start - searchMargin1 
                         motif_start = sj_start - acceptor_size_exon + 1 - int(offset2[i])
                         motif_end = sj_start + acceptor_size_intron - int(offset2[i])
-                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "acceptor", "-", 0))
+                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "Acceptor", "-", 0))
                     if junction1[i] == "s" and junction2[i] == "*": # splicing donor motif, minus direction
                         firstSearchRegion[2] = sj_end + searchMargin1
                         motif_start = sj_end - donor_size_intron - int(offset1[i])
                         motif_end = sj_end + donor_size_exon - 1 - int(offset1[i])
-                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "donor", "-", 0))
+                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "Donor", "-", 0))
                     if junction1[i] == "e" and junction2[i] == "*": # # splicing acceptor motif, plus direction
                         firstSearchRegion[2] = sj_end + searchMargin1
                         motif_start = sj_end - acceptor_size_intron - int(offset1[i])
                         motif_end = sj_end + acceptor_size_exon - 1 - int(offset1[i])
-                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "acceptor", "+", 0))
+                        splicingMotifRegions.append((F[header2ind["SJ_1"]], motif_start, motif_end, "Acceptor", "+", 0))
 
 
             ##########
@@ -148,14 +148,14 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                         if exon[3] not in targetGene: continue
                         if exon[5] == "+":
                             # splicing acceptor motif, plus direction
-                            splicingMotifRegions.append((exon[0], int(exon[1]) - acceptor_size_intron + 1, int(exon[1]) + acceptor_size_exon, "acceptor", "+", 1))
+                            splicingMotifRegions.append((exon[0], int(exon[1]) - acceptor_size_intron + 1, int(exon[1]) + acceptor_size_exon, "Acceptor", "+", 1))
                             # splicing donor motif, plus direction
-                            splicingMotifRegions.append((exon[0], int(exon[2]) - donor_size_exon + 1, int(exon[2]) + donor_size_intron, "donor", "+", 1))
+                            splicingMotifRegions.append((exon[0], int(exon[2]) - donor_size_exon + 1, int(exon[2]) + donor_size_intron, "Donor", "+", 1))
                         if exon[5] == "-":
                             # splicing donor motif, minus direction 
-                            splicingMotifRegions.append((exon[0], int(exon[1]) - donor_size_intron + 1, int(exon[1]) + donor_size_exon, "donor", "-", 1))
+                            splicingMotifRegions.append((exon[0], int(exon[1]) - donor_size_intron + 1, int(exon[1]) + donor_size_exon, "Donor", "-", 1))
                             # splicing acceptor motif, minus direction
-                            splicingMotifRegions.append((exon[0], int(exon[2]) - acceptor_size_exon + 1, int(exon[2]) + acceptor_size_intron, "acceptor", "-", 1))
+                            splicingMotifRegions.append((exon[0], int(exon[2]) - acceptor_size_exon + 1, int(exon[2]) + acceptor_size_intron, "Acceptor", "-", 1))
 
 
                 # check branchpoint within the spliced regions
@@ -172,9 +172,9 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                         for branch_line in branche_lines:
                             branch = branch_line.split('\t')
                             if branch[5] == "+":
-                                splicingMotifRegions.append((branch[0], int(branch[2]) - branch_size_intron, int(branch[2]) + branch_size_exon - 1, "branchpoint", "+", 1))
+                                splicingMotifRegions.append((branch[0], int(branch[2]) - branch_size_intron, int(branch[2]) + branch_size_exon - 1, "Branchpoint", "+", 1))
                             else:
-                                splicingMotifRegions.append((branch[0], int(branch[2]) - branch_size_exon + 1, int(branch[2]) + branch_size_intron, "branchpoint", "-", 1))
+                                splicingMotifRegions.append((branch[0], int(branch[2]) - branch_size_exon + 1, int(branch[2]) + branch_size_intron, "Branchpoint", "-", 1))
 
 
                 splicingMotifRegions = list(set(splicingMotifRegions))
@@ -193,29 +193,29 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                             indel_end = int(mutation[1]) + len(mutation[3]) - 1 if len(mutation[3]) > 1 else indel_start
                             if indel_start <= reg[2] and reg[1] <= indel_end:
                            
-                                if reg[3] in ["acceptor", "donor"]: 
-                                    if reg[3] == "acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
-                                    if reg[3] == "acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
-                                    if reg[3] == "donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
-                                    if reg[3] == "donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
+                                if reg[3] in ["Acceptor", "Donor"]: 
+                                    if reg[3] == "Acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
+                                    if reg[3] == "Acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
+                                    if reg[3] == "Donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
+                                    if reg[3] == "Donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
 
-                                    is_canonical = "non-canonical"
+                                    is_canonical = "Non-canonical"
                                     if len(mutation[3]) > 1: # deletion
                                         if indel_start <= canonical_start_pos + 1 and canonical_start_pos <= indel_end:
-                                            is_canonical = "canonical"
+                                            is_canonical = "Canonical"
                                     else: # insertion
                                         if indel_start == canonical_start_pos + 1:
-                                            is_canonical = "canonical"
+                                            is_canonical = "Canonical"
 
                                 # branch point
                                 else:
                                     if reg[4] == "+": canonical_start_pos = reg[2] - branch_size_exon + 1
                                     if reg[4] == "-": canonical_start_pos = reg[1] + branch_size_exon - 1
  
-                                    is_canonical = "non-canonical"
+                                    is_canonical = "Non-canonical"
                                     if len(mutation[3]) > 1: # deletion
                                         if indel_start <= canonical_start_pos and canonical_start_pos <= indel_end:
-                                            is_canonical = "canonical"
+                                            is_canonical = "Canonical"
                                     else: # insertion
                                         pass
 
@@ -223,34 +223,34 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
 
 
 
-                                if reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
-                                if reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
+                                if reg[5] == 0: RegMut.append([reg, reg[3] + " creation", is_canonical])
+                                if reg[5] == 1: RegMut.append([reg, reg[3] + " disruption", is_canonical])
  
                         # base substitution
                         if len(mutation[3]) == 1 and len(mutation[4]) == 1 and reg[1] <= int(mutation[1]) <= reg[2]:
                             motifSeq = ""
-                            if reg[3] == "acceptor": motifSeq = splicingAcceptorMotif[0] + splicingAcceptorMotif[1]                  
-                            if reg[3] == "donor": motifSeq = splicingDonnorMotif[0] + splicingDonnorMotif[1]
+                            if reg[3] == "Acceptor": motifSeq = splicingAcceptorMotif[0] + splicingAcceptorMotif[1]                  
+                            if reg[3] == "Donor": motifSeq = splicingDonnorMotif[0] + splicingDonnorMotif[1]
 
-                            is_canonical = "non-canonical"
-                            if reg[3] in ["acceptor", "donor"]:
-                                if reg[3] == "acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
-                                if reg[3] == "acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
-                                if reg[3] == "donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
-                                if reg[3] == "donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
+                            is_canonical = "Non-canonical"
+                            if reg[3] in ["Acceptor", "Donor"]:
+                                if reg[3] == "Acceptor" and reg[4] == "+": canonical_start_pos = reg[2] - acceptor_size_exon - 1
+                                if reg[3] == "Acceptor" and reg[4] == "-": canonical_start_pos = reg[1] + acceptor_size_exon 
+                                if reg[3] == "Donor" and reg[4] == "+": canonical_start_pos = reg[1] + donor_size_exon 
+                                if reg[3] == "Donor" and reg[4] == "-": canonical_start_pos = reg[2] - donor_size_exon - 1
 
-                                is_canonical = "canonical" if canonical_start_pos <= int(mutation[1]) <= canonical_start_pos + 1 else "non-canonical"
+                                is_canonical = "Canonical" if canonical_start_pos <= int(mutation[1]) <= canonical_start_pos + 1 else "Non-canonical"
 
                             # branchpoint 
                             else:
                                 if reg[4] == "+": canonical_start_pos = reg[2] - branch_size_exon + 1 
                                 if reg[4] == "-": canonical_start_pos = reg[1] + branch_size_exon - 1 
 
-                                is_canonical = "canonical" if canonical_start_pos == int(mutation[1]) else "non-canonical"
+                                is_canonical = "Canonical" if canonical_start_pos == int(mutation[1]) else "Non-canonical"
 
 
-                            if reg[5] == 0: RegMut.append([reg, "splicing " + reg[3] + " creation", is_canonical])
-                            if reg[5] == 1: RegMut.append([reg, "splicing " + reg[3] + " disruption", is_canonical])
+                            if reg[5] == 0: RegMut.append([reg, reg[3] + " creation", is_canonical])
+                            if reg[5] == 1: RegMut.append([reg, reg[3] + " disruption", is_canonical])
 
                     for item in RegMut:
                         mut_print_str = ','.join([mutation[i] for i in [0, 1, 3, 4]])
@@ -296,8 +296,9 @@ def get_snv_junction_only_dist(input_file, output_file, mutation_file, annotatio
             sj_start = int(F[header2ind["SJ_2"]]) - 1
             sj_end = int(F[header2ind["SJ_3"]]) + 1
 
-            if F[header2ind["Splicing_Class"]] not in ["exon-skip", "alternative-3'-splice-site", "alternative-5'-splice-site",
-                                                       "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]: continue
+            if F[header2ind["Splicing_Class"]] not in ["Exon skipping", "Alternative 3'SS", "Alternative 5'SS",
+                                                       "Intronic alternative 3'SS", "Intronic alternative 5'SS"]: continue
+
 
             firstSearchRegion = [F[header2ind["SJ_1"]], sj_start, sj_end]
 
@@ -416,8 +417,9 @@ def get_sv_junction(input_file, output_file, sv_file, genome_id, is_grc):
                         """
 
                         # if F[header2ind["Splicing_Class"]] in ["exon-skip", "splice-site-slip", "pseudo-exon-inclusion"]: 
-                        if F[header2ind["Splicing_Class"]] in ["exon-skip", "alternative-3'-splice-site", "alternative-5'-splice-site",
-                                                               "intronic-alternative-3'-splice-site", "intronic-alternative-5'-splice-site"]:
+                        if F[header2ind["Splicing_Class"]] in ["Exon skipping", "Alternative 3'SS", "Alternative 5'SS",
+                                                               "Intronic alternative 3'SS", "Intronic alternative 5'SS"]:
+
 
                             associated_sv_list.append(SV_cur)
                         elif abs(sj_start - SV_cur.pos1) <= sv_comp_margin and abs(sj_end - SV_cur.pos2) <= sv_comp_margin:

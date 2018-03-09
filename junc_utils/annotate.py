@@ -318,7 +318,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                     if junction1[gene] == "e" and junction2[gene] == "s" and exon2[gene] - exon1[gene] == 1: passGene.append(gene)
                     if junction2[gene] == "e" and junction1[gene] == "s" and exon1[gene] - exon2[gene] == 1: passGene.append(gene)
 
-            if len(passGene) > 0: spliceClass = "known"
+            if len(passGene) > 0: spliceClass = "Known"
 
             ##########
             # check for exon skip
@@ -336,8 +336,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                             if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
-                if len(passGene) > 0: spliceClass = "exon-skip"
-                if len(inframe_gene) > 0: in_frame = "in-frame"
+                if len(passGene) > 0: spliceClass = "Exon skipping"
+                if len(inframe_gene) > 0: in_frame = "In-frame"
 
             ##########
             # check for alternative-3'-splice-site
@@ -355,8 +355,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                             if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
-                if len(passGene) > 0: spliceClass = "alternative-3'-splice-site"
-                if len(inframe_gene) > 0: in_frame = "in-frame"
+                if len(passGene) > 0: spliceClass = "Alternative 3'SS"
+                if len(inframe_gene) > 0: in_frame = "In-frame"
 
 
             # check for alternative-5'-splice-site
@@ -374,8 +374,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                             if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
-                if len(passGene) > 0: spliceClass = "alternative-5'-splice-site"
-                if len(inframe_gene) > 0: in_frame = "in-frame"
+                if len(passGene) > 0: spliceClass = "Alternative 5'SS"
+                if len(inframe_gene) > 0: in_frame = "In-frame"
 
             ##########
             # check for intronic-alternative-3'-splice-site
@@ -388,7 +388,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                            (gene in junction2 and junction2[gene] == "e" and gene not in junction1 and gene not in exon1):
                             passGene.append(gene)
             
-                if len(passGene) > 0: spliceClass = "intronic-alternative-3'-splice-site"
+                if len(passGene) > 0: spliceClass = "Intronic alternative 3'SS"
 
             # check for intronic-alternative-5'-splice-site
             if spliceClass == "":
@@ -400,7 +400,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                            (gene in junction2 and junction2[gene] == "s" and gene not in junction1 and gene not in exon1):
                             passGene.append(gene)
                 
-                if len(passGene) > 0: spliceClass = "intronic-alternative-5'-splice-site"
+                if len(passGene) > 0: spliceClass = "Intronic alternative 5'SS"
 
             ##########
             # within-exon
@@ -417,8 +417,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                             if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
-                if len(passGene) > 0: spliceClass = "within-exon"
-                if len(inframe_gene) > 0: in_frame = "in-frame"
+                if len(passGene) > 0: spliceClass = "Within exon"
+                if len(inframe_gene) > 0: in_frame = "In-frame"
 
             ##########
             # check for exon-exon-junction
@@ -435,8 +435,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                             if sc_size != 0 and sc_size % 3 == 0:
                                 inframe_gene.append(gene)
 
-                if len(passGene) > 0: spliceClass = "exon-exon-junction"
-                if len(inframe_gene) > 0: in_frame = "in-frame"
+                if len(passGene) > 0: spliceClass = "Exon exon junction"
+                if len(inframe_gene) > 0: in_frame = "In-frame"
 
             ##########
             # check for within-gene 
@@ -445,7 +445,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                 for gene in checkGenes:
                     if gene in gene1 and gene in gene2 and gene: passGene.append(gene)   
             
-                if len(passGene) > 0: spliceClass = "within-gene"
+                if len(passGene) > 0: spliceClass = "Within gene"
 
 
             ##########
@@ -464,7 +464,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                             #     inframe_gene.append(gene)
 
 
-                if len(passGene) > 0: spliceClass = "spliced-chimera"
+                if len(passGene) > 0: spliceClass = "Spliced chimera"
                 # if len(inframe_gene) > 0: in_frame = "in-frame"
 
             ##########
@@ -475,10 +475,10 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                     for g2 in gene2:
                         passGene.append(g1 + ',' + g2)
 
-                if len(passGene) > 0: spliceClass = "unspliced-chimera"
+                if len(passGene) > 0: spliceClass = "Unspliced chimera"
 
 
-            if spliceClass == "": spliceClass = "other"
+            if spliceClass == "": spliceClass = "Other"
             
 
             # summarize the exon and junction information for display
