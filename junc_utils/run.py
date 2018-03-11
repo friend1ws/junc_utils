@@ -1,7 +1,9 @@
 #! /usr/bin/env python
 
-import os, subprocess
+import os, subprocess, logging
 import utils
+
+logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
 def filter_main(args):
 
@@ -11,13 +13,21 @@ def filter_main(args):
 
 def annotate_main(args):
    
-    import annotate 
-    annotate.annot_junction(args.junc_file, args.output_path, args.junction_margin, args.exon_margin, args.genome_id, args.grc)
+    import annotate
+    from annot_utils.utils import grc_check
+    
+    if args.grc == True:
+        logging.warning("--grc argument is deprecated and ignored")
+
+    is_grc = grc_check(args.junc_file, [0])
+ 
+    annotate.annot_junction(args.junc_file, args.output_path, args.junction_margin, args.exon_margin, args.genome_id, is_grc)
 
 
 def associate_main(args):
 
     import associate
+    from annot_utils.utils import grc_check
 
     mutation_file = args.mutation_file
     output_file = args.output_file
@@ -27,6 +37,16 @@ def associate_main(args):
     is_sv = True if args.sv else False
     is_debug = True if args.debug else False 
     reference_genome = args.reference
+
+    if args.grc == True:
+        logging.warning("--grc argument is deprecated and ignored")
+
+    is_grc = grc_check(args.annotated_junction_file, [0])
+    is_grc_mut = grc_check(mutation_file, [0]) if is_sv == False else grc_check(mutation_file, [0, 3])
+
+    if is_grc != is_grc_mut:
+        logging.warning("Splicing junction file and mutation file seems to use different coordinate system.")
+
 
     if not is_sv and is_anno and reference_genome is None:
         print >> sys.stderr, "When the mutation file format is annovar format, reference genome should be specified"
@@ -106,7 +126,7 @@ def associate_main(args):
                                         output_file,
                                         output_file + ".mutran_tmp.vcf.gz",
                                         args.donor_size, args.acceptor_size,
-                                        args.genome_id, args.grc,
+                                        args.genome_id, is_grc,
                                         args.branchpoint, args.branchpoint_size)
         else:
             associate.get_snv_junction_only_dist(args.annotated_junction_file, 
@@ -118,7 +138,7 @@ def associate_main(args):
         associate.get_sv_junction(args.annotated_junction_file,
                                   output_file,
                                   output_file + ".mutran_tmp.bedpe.gz",               
-                                  args.genome_id, args.grc)
+                                  args.genome_id, is_grc)
     ##########
 
     if is_debug != True:

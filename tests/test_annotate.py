@@ -40,7 +40,7 @@ class TestAnnotate(unittest.TestCase):
         output_file = tmp_dir + "/CCLE-GSU-RNA-08.SJ.out.filter.annotate.tab"
         answer_file = cur_dir + "/data/annotate/CCLE-GSU-RNA-08.SJ.out.filter.annotate.tab"
 
-        args = self.parser.parse_args(["annotate", input_file, output_file, "--grc"])
+        args = self.parser.parse_args(["annotate", input_file, output_file])
         args.func(args)
 
         self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
