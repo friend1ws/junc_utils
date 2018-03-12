@@ -39,6 +39,9 @@ def associate_main(args):
     is_debug = True if args.debug else False 
     reference_genome = args.reference
 
+    if args.mutation_format == "anno":
+        logger.warning("--mutation_format is deprepaced and ignored.")
+
     if args.grc == True:
         logger.warning("--grc argument is deprecated and ignored.")
 
