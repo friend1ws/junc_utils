@@ -1,9 +1,10 @@
 #! /usr/bin/env python
 
-import os, subprocess, logging
+import os, subprocess
 import utils
+from logger import get_logger
+logger = get_logger()
 
-logging.basicConfig(format='%(asctime)s %(message)s', datefmt='%m/%d/%Y %H:%M:%S')
 
 def filter_main(args):
 
@@ -17,7 +18,7 @@ def annotate_main(args):
     from annot_utils.utils import grc_check
     
     if args.grc == True:
-        logging.warning("--grc argument is deprecated and ignored")
+        logger.warning("--grc argument is deprecated and ignored.")
 
     is_grc = grc_check(args.junc_file, [0])
  
@@ -39,13 +40,13 @@ def associate_main(args):
     reference_genome = args.reference
 
     if args.grc == True:
-        logging.warning("--grc argument is deprecated and ignored")
+        logger.warning("--grc argument is deprecated and ignored.")
 
     is_grc = grc_check(args.annotated_junction_file, [0])
     is_grc_mut = grc_check(mutation_file, [0]) if is_sv == False else grc_check(mutation_file, [0, 3])
 
     if is_grc != is_grc_mut:
-        logging.warning("Splicing junction file and mutation file seems to use different coordinate system.")
+        logger.warning("Splicing junction file and mutation file seems to use different coordinate system.")
 
 
     if not is_sv and is_anno and reference_genome is None:

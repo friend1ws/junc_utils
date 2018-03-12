@@ -16,25 +16,25 @@ def create_parser():
     # filter
 
     filter = subparsers.add_parser("filter",
-                                   help = "filter out splicing junctions outside specified conditions")
+                                   help = "Filter out splicing junctions outside specified conditions")
 
     filter.add_argument("junc_file", metavar = "sample.SJ.out.tab", default = None, type = str,
-                        help = "the path to star junction file")
+                        help = "Path to star junction file")
 
     filter.add_argument("output_path", metavar = "output.txt", default = None, type = str,
-                        help = "the path to the output file")
+                        help = "Path to the output file")
 
     filter.add_argument("--read_num_thres", type = int, default = 3,
-                        help = "remove splicing junctions whose supporting numbers are below this value (default: %(default)s)")
+                        help = "Remove splicing junctions whose supporting numbers are below this value (default: %(default)s)")
                                
     filter.add_argument("--overhang_thres", type = int, default = 10,
-                        help = "remove splicing junctions whose overhang sizes are this value (default: %(default)s)")
+                        help = "Remove splicing junctions whose overhang sizes are this value (default: %(default)s)")
                                
     filter.add_argument("--keep_annotated", default = False, action = 'store_true',
-                        help = "do not remove annotated splicing junctions")
+                        help = "Do not remove annotated splicing junctions")
 
     filter.add_argument("--pooled_control_file", default = None, type = str,
-                        help = "the path to control data created by merge_control (default: %(default)s)")
+                        help = "Path to control data created by merge_control (default: %(default)s)")
 
     filter.set_defaults(func = filter_main)
 
@@ -42,28 +42,28 @@ def create_parser():
     # annotate
 
     annotate = subparsers.add_parser("annotate",
-                                     help = "annotate junctions")
+                                     help = "Annotate junctions")
 
     annotate.add_argument("junc_file", metavar = "sample.SJ.out.tab", default = None, type = str,
-                          help = "the path to star splicing junction file")
+                          help = "Path to star splicing junction file")
 
     annotate.add_argument("output_path", metavar = "output.txt", default = None, type = str,
-                          help = "the path to the output file")
+                          help = "Path to the output file")
 
     # annotate.add_argument("annotation_dir", metavar = "annotation_dir", default = None, type = str,
     #                       help = "the path to the database directory")
 
     annotate.add_argument("--grc", default = False, action = 'store_true',
-                          help = "convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
+                          help = "Deprecated. This is not used any more. Convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
 
     annotate.add_argument("--genome_id", choices = ["hg19", "hg38", "mm10"], default = "hg19",
-                          help = "the genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
+                          help = "Genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
 
     annotate.add_argument("--junction_margin", type = int, default = 3,
-                          help = "the allowed margin size for the difference between splicing breakpoints and exon-intron junctions")
+                          help = "Allowed margin size for the difference between splicing breakpoints and exon-intron junctions")
 
     annotate.add_argument("--exon_margin", type = int, default = 30,
-                          help = "the allowed margin size for the difference between splicing breakpoints and exonic region")
+                          help = "Allowed margin size for the difference between splicing breakpoints and exonic region")
 
     annotate.set_defaults(func = annotate_main)
 
@@ -71,36 +71,36 @@ def create_parser():
     # associate
 
     associate = subparsers.add_parser("associate",
-                                     help = "associate junctions with mutations or SVs")
+                                     help = "Associate junctions with mutations or SVs")
 
     associate.add_argument("annotated_junction_file", metavar = "annotated_junction.SJ.out.tab", default = None, type = str,
-                           help = "the path to the annotated splicing junction file")
+                           help = "Path to the annotated splicing junction file")
 
     associate.add_argument("mutation_file", metavar = "mutation.vcf.gz", default = None, type = str,
-                           help = "the path to the mutation file")
+                           help = "Path to the mutation file")
 
     associate.add_argument("output_file", metavar = "output_file", default = None, type = str, 
-                           help = "the path to the output")
+                           help = "Path to the output")
 
     # associate.add_argument("annotation_dir", metavar = "annotation_dir", type = str,
     #                        help = "the path to database directory")
 
     associate.add_argument("--grc", default = False, action = 'store_true',
-                           help = "convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
+                           help = "Deprecated. This is not used any more. Convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
 
     associate.add_argument("--genome_id", choices = ["hg19", "hg38", "mm10"], default = "hg19",
-                           help = "the genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
+                           help = "Genome id used for selecting UCSC-GRC chromosome name corresponding files (default: %(default)s)")
 
     associate.add_argument("--donor_size", metavar = "donor_size", default = "3,6", type = str,
-                           help = "splicing donor site size (exonic region size, intronic region size) (default: %(default)s)")
+                           help = "Splicing donor site size (exonic region size, intronic region size) (default: %(default)s)")
 
     associate.add_argument("--acceptor_size", metavar = "acceptor_size", default = "6,1", type = str,
-                           help = "splicing donor site size (intronic region size, exonic region size) (default: %(default)s)")
+                           help = "Splicing donor site size (intronic region size, exonic region size) (default: %(default)s)")
 
     associate.add_argument("--reference", metavar = "reference.fa", type = str,
-                           help = "the path to the reference genomoe sequence (necessary for anno format)")
+                           help = "Path to the reference genomoe sequence (necessary for anno format)")
 
-    associate.add_argument("--debug", default = False, action = 'store_true', help = "keep intermediate files")
+    associate.add_argument("--debug", default = False, action = 'store_true', help = "Keep intermediate files")
 
     associate.add_argument("--mutation_format", choices=["vcf", "anno"], default = "vcf",
                            help = "Deprecated. This is not used any more. The format of mutation file vcf or annovar (tsv) format")
@@ -112,45 +112,45 @@ def create_parser():
     #                        help = "do not consider indels around splicing junctions (putative splicing motif creatin indels)")
 
     associate.add_argument('--only_dist', action='store_true',
-                           help = "associate all mutations within the junctions plus specified margin (this is mainly for evaluation)")
+                           help = "Associate all mutations within the junctions plus specified margin (this is mainly for evaluation)")
 
     associate.add_argument("--only_dist_search_margin", metavar = "only_dist_search_margin", default = 100, type = int,
-                           help = "margin size used when only_dist option is active (default: %(default)s)")
+                           help = "Margin size used when only_dist option is active (default: %(default)s)")
 
     associate.add_argument('--sv', action='store_true',
-                           help = "analysis structural variation file")
+                           help = "Analysis structural variation file")
 
     associate.add_argument('--branchpoint', action='store_true',
-                           help = "include branch points to the association analysis")
+                           help = "Include branch points to the association analysis")
 
     associate.add_argument("--branchpoint_size", metavar = "branchpoint_size", default = "3,2", type = str,
-                           help = "splicing branchpoint size (intronic-side region size, exonic-side region size) (default: %(default)s)")
+                           help = "Splicing branchpoint size (intronic-side region size, exonic-side region size) (default: %(default)s)")
 
     associate.set_defaults(func = associate_main)
 
     ##########
     # merge control
     merge_control = subparsers.add_parser("merge_control",
-                                          help = "merge, compress and index the splicing junction list (.SJ.out.tab file generated by STAR)")
+                                          help = "Merge, compress and index the splicing junction list (.SJ.out.tab file generated by STAR)")
 
     merge_control.add_argument("junc_list", metavar = "junc_list.txt", default = None, type = str,
-                               help = "junction path list")
+                               help = "Junction path list")
 
     merge_control.add_argument("output_path", default = None, type = str,
-                               help = "the path of the output file")
+                               help = "Path of the output file")
 
 
     merge_control.add_argument("--read_num_thres", type = int, default = 3,
-                               help = "remove splicing junctions whose supporting numbers are below this value (default: %(default)s)")
+                               help = "Remove splicing junctions whose supporting numbers are below this value (default: %(default)s)")
 
     merge_control.add_argument("--overhang_thres", type = int, default = 10,
-                               help = "remove splicing junctions whose overhang sizes are this value (default: %(default)s)")
+                               help = "Remove splicing junctions whose overhang sizes are this value (default: %(default)s)")
 
     merge_control.add_argument("--keep_annotated", default = False, action = 'store_true', 
-                               help = "do not remove annotated splicing junctions")
+                               help = "Do not remove annotated splicing junctions")
 
     merge_control.add_argument("--sample_num_thres", type = int, default = 2,
-                               help = "register splicing junctions at least shared by specified number of samples (default: %(default)s)")
+                               help = "Register splicing junctions at least shared by specified number of samples (default: %(default)s)")
 
     merge_control.set_defaults(func = merge_control_main)
 
