@@ -30,7 +30,7 @@ def convert_anno2vcf(input_file, output_file, reference, header = False):
     """
 
     if header == True:
-        print >> hout, "##fileformat=#VFCv4.1"
+        print >> hout, "##fileformat=VCFv4.1"
         print >> hout, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT"
 
     for line in hin:

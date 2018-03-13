@@ -3,7 +3,7 @@
 import os, subprocess
 import utils
 from logger import get_logger
-logger = get_logger()
+logger = get_logger(__name__)
 
 
 def filter_main(args):
