@@ -31,7 +31,7 @@ def convert_anno2vcf(input_file, output_file, reference, header = False):
 
     if header == True:
         print >> hout, "##fileformat=VCFv4.1"
-        print >> hout, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO\tFORMAT"
+        print >> hout, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO"
 
     for line in hin:
         F = line.rstrip('\n').split('\t')
