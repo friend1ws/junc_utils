@@ -218,8 +218,8 @@ def merge_control_main(args):
                         print >> hout, temp_key + '\t' + ','.join([str(x) for x in sorted(temp_read_num)])
                 temp_key = key
                 temp_read_num = []
-            else:
-                temp_read_num.append(read_num)
+
+            temp_read_num.append(read_num)
 
         if temp_key != "":
             if len(temp_read_num) >= sample_num_thres:

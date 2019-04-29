@@ -49,7 +49,7 @@ class TestAssociate(unittest.TestCase):
         output_file = tmp_dir + "/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
         answer_file = cur_dir + "/data/associate/CCLE-HCC1143-RNA-08.SJ.out.filter.annotate.associate.tab"
 
-        args = self.parser.parse_args(["associate", annotated_sj_file, mutation_file, output_file, "--grc"])
+        args = self.parser.parse_args(["associate", annotated_sj_file, mutation_file, output_file])
         args.func(args)
 
         self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
