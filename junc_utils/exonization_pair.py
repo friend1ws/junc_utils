@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import sys, re, subprocess
 import annot_utils.gene, annot_utils.exon
 import pysam
@@ -14,7 +15,7 @@ def check_splicing_junction_for_exonization(exonizaiton_junction, output_file, g
 
     pos_match = re.match(r'([\w\d]+)\:(\d+)\-(\d+)', exonizaiton_junction)
     if pos_match is None:
-        print >> sys.stderr, "exonization_junction is not the right format"
+        print("exonization_junction is not the right format", file = sys.stderr)
         sys.exit(1)
 
     schr, sstart, send = pos_match.group(1), int(pos_match.group(2)), int(pos_match.group(3))
@@ -125,7 +126,7 @@ def check_opposite_junction(junc_file, exonization_info, output_file, control_fi
                                 control_flag = 1
 
                 if control_flag == 0:
-                    print >> hout, '\t'.join(F)
+                    print('\t'.join(F), file = hout)
 
      
     hout.close()

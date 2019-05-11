@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import unittest
 import os, glob, tempfile, shutil, filecmp
 import junc_utils
@@ -24,7 +25,7 @@ class TestMergeControl(unittest.TestCase):
         with open(tmp_dir + "/CCLE.SJ_out_tab.list.txt", 'w') as hout:
             for sj_file in sorted(all_sj_file):
                 if os.path.basename(sj_file) in ["CCLE-HCC1143-RNA-08.SJ.out.tab", "CCLE-HCC1954-RNA-08.SJ.out.tab", "CCLE-MCF7-RNA-08.SJ.out.tab"]:
-                    print >> hout, sj_file
+                    print(sj_file, file = hout)
 
 
         input_list_file = tmp_dir + "/CCLE.SJ_out_tab.list.txt"

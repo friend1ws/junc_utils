@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import sys, gzip
 import pysam
 
@@ -30,8 +31,8 @@ def convert_anno2vcf(input_file, output_file, reference, header = False):
     """
 
     if header == True:
-        print >> hout, "##fileformat=VCFv4.1"
-        print >> hout, "#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO"
+        print("##fileformat=VCFv4.1", file = hout)
+        print("#CHROM\tPOS\tID\tREF\tALT\tQUAL\tFILTER\tINFO", file = hout)
 
     for line in hin:
         F = line.rstrip('\n').split('\t')
@@ -66,8 +67,8 @@ def convert_anno2vcf(input_file, output_file, reference, header = False):
         # INFO = "TD=" + F[9] + ";TV=" + F[10] + ";ND=" + F[13] + ";NV=" + F[14] + ";SOMATIC"
         INFO = "SOMATIC"
 
-        print >> hout, F[0] + "\t" + pos + "\t.\t" + ref + "\t" + alt \
-            + "\t" + str(QUAL) + "\t" + "PASS" + "\t" + INFO 
+        print(F[0] + "\t" + pos + "\t.\t" + ref + "\t" + alt \
+                + "\t" + str(QUAL) + "\t" + "PASS" + "\t" + INFO, file = hout)
 
 
 def remove_vcf_header(input_file, output_file):
@@ -76,7 +77,7 @@ def remove_vcf_header(input_file, output_file):
     with open(input_file, 'r') as hin:
         for line in hin:
             line = line.rstrip('\n')
-            if not line.startswith('#'): print >> hout, line
+            if not line.startswith('#'): print(line, file = hout)
 
     hout.close()
 
@@ -94,7 +95,7 @@ def convert_genosv2bed(input_file, output_file):
             chr1, pos1, dir1, chr2, pos2, dir2, inseq, sv_type = F[0], F[1], F[2], F[3], F[4], F[5], F[6], F[7]
 
             if chr1 != chr2: continue
-            print >> hout, '\t'.join([chr1, str(int(pos1) - 1), pos2, chr1, pos1, dir1, chr2, pos2, dir2, inseq, sv_type]) 
+            print('\t'.join([chr1, str(int(pos1) - 1), pos2, chr1, pos1, dir1, chr2, pos2, dir2, inseq, sv_type]), file = hout) 
             # start1, end1 = str(int(F[1]) - 1), F[1]
             # start2, end2 = str(int(F[4]) - 1), F[4]
             # dir1, dir2 = F[2], F[5]
@@ -163,7 +164,7 @@ def proc_star_junction(input_file, output_file, control_file, read_num_thres, ov
                 F[1] = str(int(F[1]) - 1)
                 F[2] = str(int(F[2]) + 1)
 
-            print >> hout, '\t'.join(F)
+            print('\t'.join(F), file = hout)
 
     hout.close()
 

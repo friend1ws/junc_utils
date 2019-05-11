@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import pysam 
 import sys, subprocess
 from itertools import izip
@@ -52,10 +53,10 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
                 chr_name, sj_start, sj_end = F[0], int(F[1]) - 1, int(F[2]) + 1
                 sj_id = ','.join([F[0], F[1], F[2]])
 
-                print >> hout_g1, chr_name + '\t' + str(sj_start - 1) + '\t' + str(sj_start) + '\t' + sj_id
-                print >> hout_g2, chr_name + '\t' + str(sj_end - 1) + '\t' + str(sj_end) + '\t' + sj_id
-                print >> hout_e1, chr_name + '\t' + str(sj_start - exon_margin - 1) + '\t' + str(sj_start + exon_margin) + '\t' + sj_id
-                print >> hout_e2, chr_name + '\t' + str(sj_end - exon_margin - 1) + '\t' + str(sj_end + exon_margin) + '\t' + sj_id
+                print(chr_name + '\t' + str(sj_start - 1) + '\t' + str(sj_start) + '\t' + sj_id, file = hout_g1)
+                print(chr_name + '\t' + str(sj_end - 1) + '\t' + str(sj_end) + '\t' + sj_id, file = hout_g2)
+                print(chr_name + '\t' + str(sj_start - exon_margin - 1) + '\t' + str(sj_start + exon_margin) + '\t' + sj_id, file = hout_e1)
+                print(chr_name + '\t' + str(sj_end - exon_margin - 1) + '\t' + str(sj_end + exon_margin) + '\t' + sj_id, file = hout_e2)
 
 
     with open(output_file + ".tmp2.junc1.gene.bed", 'w') as hout_g1:
@@ -85,28 +86,28 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
         for line in hin:
             F = line.rstrip('\n').split('\t')
             if F[3] != tmp_id:
-                if tmp_id != "": print >> hout, tmp_id + '\t' + ','.join(list(set(tmp_gene)))
+                if tmp_id != "": print(tmp_id + '\t' + ','.join(list(set(tmp_gene))), file = hout)
                 tmp_id, tmp_gene = F[3], []
             if F[7] != ".":
                 tmp_gene.append(F[7])
             else:
                 tmp_gene.append("---")
 
-        if tmp_id != "": print >> hout, tmp_id + '\t' + ','.join(list(set(tmp_gene)))
+        if tmp_id != "": print(tmp_id + '\t' + ','.join(list(set(tmp_gene))), file = hout)
 
     with open(output_file + ".tmp2.junc2.gene.bed", 'r') as hin, open(output_file + ".tmp3.junc2.gene.bed", 'w') as hout:
         tmp_id, tmp_gene = "", []
         for line in hin:
             F = line.rstrip('\n').split('\t')
             if F[3] != tmp_id:
-                if tmp_id != "": print >> hout, tmp_id + '\t' + ','.join(list(set(tmp_gene)))
+                if tmp_id != "": print(tmp_id + '\t' + ','.join(list(set(tmp_gene))), file = hout)
                 tmp_id, tmp_gene = F[3], []
             if F[7] != ".":
                 tmp_gene.append(F[7])
             else:
                 tmp_gene.append("---")
 
-        if tmp_id != "": print >> hout, tmp_id + '\t' + ','.join(list(set(tmp_gene)))
+        if tmp_id != "": print(tmp_id + '\t' + ','.join(list(set(tmp_gene))), file = hout)
 
     with open(output_file + ".tmp2.junc1.exon.bed", 'r') as hin, open(output_file + ".tmp3.junc1.exon.bed", 'w') as hout:
         tmp_id, tmp_gene, tmp_exon_num, tmp_edge, tmp_offset = "", [], [], [], []
@@ -118,9 +119,9 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             if F[3] != tmp_id:
                 if tmp_id != "":
                     if not len(tmp_gene) == len(tmp_exon_num) == len(tmp_edge) == len(tmp_offset):
-                        print >> sys.stderr, "Inconsistency for the format in creating exon information files"
+                        print("Inconsistency for the format in creating exon information files", file = sys.stderr)
                         sys.exit(1)
-                    print >> hout, '\t'.join([tmp_id, ','.join(tmp_gene), ','.join(tmp_exon_num), ','.join(tmp_edge), ','.join(tmp_offset)])
+                    print('\t'.join([tmp_id, ','.join(tmp_gene), ','.join(tmp_exon_num), ','.join(tmp_edge), ','.join(tmp_offset)]), file = hout)
                 tmp_id, tmp_gene, tmp_exon_num, tmp_edge, tmp_offset = F[3], [], [], [], []
 
             if F[7] != ".":
@@ -137,9 +138,9 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
 
         if tmp_id != "":
             if not len(tmp_gene) == len(tmp_exon_num) == len(tmp_edge) == len(tmp_offset):
-                print >> sys.stderr, "Inconsistency for the format in creating exon information files"
+                print("Inconsistency for the format in creating exon information files", file = sys.stderr)
                 sys.exit(1)
-            print >> hout, '\t'.join([tmp_id, ','.join(tmp_gene), ','.join(tmp_exon_num), ','.join(tmp_edge), ','.join(tmp_offset)])
+            print('\t'.join([tmp_id, ','.join(tmp_gene), ','.join(tmp_exon_num), ','.join(tmp_edge), ','.join(tmp_offset)]), file = hout)
 
     with open(output_file + ".tmp2.junc2.exon.bed", 'r') as hin, open(output_file + ".tmp3.junc2.exon.bed", 'w') as hout:
         tmp_id, tmp_gene, tmp_exon_num, tmp_edge, tmp_offset = "", [], [], [], []
@@ -151,9 +152,9 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             if F[3] != tmp_id:
                 if tmp_id != "":
                     if not len(tmp_gene) == len(tmp_exon_num) == len(tmp_edge) == len(tmp_offset):
-                        print >> sys.stderr, "Inconsistency for the format in creating exon information files"
+                        print("Inconsistency for the format in creating exon information files", file = sys.stderr)
                         sys.exit(1)
-                    print >> hout, '\t'.join([tmp_id, ','.join(tmp_gene), ','.join(tmp_exon_num), ','.join(tmp_edge), ','.join(tmp_offset)])
+                    print('\t'.join([tmp_id, ','.join(tmp_gene), ','.join(tmp_exon_num), ','.join(tmp_edge), ','.join(tmp_offset)]), file = hout)
                 tmp_id, tmp_gene, tmp_exon_num, tmp_edge, tmp_offset = F[3], [], [], [], []
 
             if F[7] != ".":
@@ -170,9 +171,9 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
 
         if tmp_id != "":
             if not len(tmp_gene) == len(tmp_exon_num) == len(tmp_edge) == len(tmp_offset):
-                print >> sys.stderr, "Inconsistency for the format in creating exon information files"
+                print("Inconsistency for the format in creating exon information files", file = sys.stderr)
                 sys.exit(1)
-            print >> hout, '\t'.join([tmp_id, ','.join(tmp_gene), ','.join(tmp_exon_num), ','.join(tmp_edge), ','.join(tmp_offset)])
+            print('\t'.join([tmp_id, ','.join(tmp_gene), ','.join(tmp_exon_num), ','.join(tmp_edge), ','.join(tmp_offset)]), file = hout)
 
     subprocess.check_call(["rm", "-rf", output_file + ".tmp2.junc1.gene.bed"])
     subprocess.check_call(["rm", "-rf", output_file + ".tmp2.junc2.gene.bed"])
@@ -189,8 +190,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
 
             # key check
             if not F_g1[0] == F_g2[0]:
-                print >> sys.stderr, "Inconsistency of splicing junction keys in the information files: " + output_file + ".tmp3.junc12.gene.bed" 
-                print F_g1[0], F_g2[0]
+                print("Inconsistency of splicing junction keys in the information files: " + output_file + ".tmp3.junc12.gene.bed", file = sys.stderr)
+                print(F_g1[0] + ' ' + F_g2[0])
                 sys.exit(1)
 
             FF = F_g1[0].split(',')
@@ -202,7 +203,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             common_gene_list = list(set(gene1) & set(gene2))
             common_gene = ','.join(common_gene_list) if len(common_gene_list) > 0 else "---"
 
-            print >> hout, chr_name + '\t' + str(sj_start - exon_margin - 1) + '\t' + str(sj_end + exon_margin) + '\t' + F_g1[0] + '\t' + common_gene
+            print(chr_name + '\t' + str(sj_start - exon_margin - 1) + '\t' + str(sj_end + exon_margin) + '\t' + F_g1[0] + '\t' + common_gene, file = hout)
 
 
     with open(output_file + ".tmp3.junc12.gene.coding.bed", 'w') as hout:
@@ -215,8 +216,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
             if tmp_id != F[3]:
                 if tmp_id != "":
                     if len(tmp_gene2coding_size) == 0: tmp_gene2coding_size["---"] = "---"
-                    print >> hout, tmp_id + '\t' + ','.join(tmp_gene2coding_size.keys()) + '\t' + \
-                      ','.join([str(x) for x in tmp_gene2coding_size.values()])
+                    print(tmp_id + '\t' + ','.join(tmp_gene2coding_size.keys()) + '\t' + \
+                      ','.join([str(x) for x in tmp_gene2coding_size.values()]), file = hout)
 
                 tmp_id = F[3]
                 _, tmp_sj_start, tmp_sj_end = tmp_id.split(',')
@@ -245,8 +246,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
 
         if tmp_id != "":
             if len(tmp_gene2coding_size) == 0: tmp_gene2coding_size["---"] = "---"
-            print >> hout, tmp_id + '\t' + ','.join(tmp_gene2coding_size.keys()) + '\t' + \
-                      ','.join([str(x) for x in tmp_gene2coding_size.values()])
+            print(tmp_id + '\t' + ','.join(tmp_gene2coding_size.keys()) + '\t' + \
+                  ','.join([str(x) for x in tmp_gene2coding_size.values()]), file = hout)
  
     subprocess.check_call(["rm", "-rf", output_file + ".tmp.refCoding.bed.gz"])
     subprocess.check_call(["rm", "-rf", output_file + ".tmp.refCoding.bed.gz.tbi"])
@@ -258,10 +259,10 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
     with open(input_file, 'r') as hin, open(output_file, 'w') as hout:
         line = hin.readline()
         F = line.rstrip('\n').split('\t')
-        print >> hout, '\t'.join(["SJ_" + str(i) for i in range(1, len(F) + 1)]) + '\t' + \
-                         "Splicing_Class" + '\t' + "Is_Inframe" + '\t' + "Gene_1" + '\t' + "Exon_Num_1" + '\t' + \
-                         "Is_Boundary_1" + '\t' + "Offset_1" + '\t' + "Gene_2" + '\t' + "Exon_Num_2" + '\t' + \
-                         "Is_Boundary_2" + '\t' + "Offset_2"
+        print('\t'.join(["SJ_" + str(i) for i in range(1, len(F) + 1)]) + '\t' + \
+              "Splicing_Class" + '\t' + "Is_Inframe" + '\t' + "Gene_1" + '\t' + "Exon_Num_1" + '\t' + \
+              "Is_Boundary_1" + '\t' + "Offset_1" + '\t' + "Gene_2" + '\t' + "Exon_Num_2" + '\t' + \
+              "Is_Boundary_2" + '\t' + "Offset_2", file = hout)
 
     with open(input_file, 'r') as hin, open(output_file + ".tmp3.junc1.gene.bed", 'r') as hin_g1, open(output_file + ".tmp3.junc2.gene.bed", 'r') as hin_g2, \
       open(output_file + ".tmp3.junc1.exon.bed", 'r') as hin_e1, open(output_file + ".tmp3.junc2.exon.bed", 'r') as hin_e2, \
@@ -279,8 +280,8 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
 
             # key check
             if not sj_id == F_g1[0] == F_g2[0] == F_e1[0] == F_e2[0] == F_c[0]:
-                print >> sys.stderr, "Inconsistency of splicing junction keys in the information files"
-                print sj_id, F_g1[0], F_g2[0], F_e1[0], F_e2[0], F_c[0]
+                print("Inconsistency of splicing junction keys in the information files", file = sys.stderr)
+                print(sj_id, F_g1[0], F_g2[0], F_e1[0], F_e2[0], F_c[0])
                 sys.exit(1)
 
             gene1 = F_g1[1].split(',') if F_g1[1] != "---" else []
@@ -542,7 +543,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
 
          
 
-            print >> hout, '\t'.join(F) + '\t' + spliceClass + '\t' + in_frame + '\t' + '\t'.join([';'.join(geneInfo1), ';'.join(exonInfo1), ';'.join(junctionInfo1), ';'.join(offsetInfo1), ';'.join(geneInfo2), ';'.join(exonInfo2), ';'.join(junctionInfo2), ';'.join(offsetInfo2)])
+            print('\t'.join(F) + '\t' + spliceClass + '\t' + in_frame + '\t' + '\t'.join([';'.join(geneInfo1), ';'.join(exonInfo1), ';'.join(junctionInfo1), ';'.join(offsetInfo1), ';'.join(geneInfo2), ';'.join(exonInfo2), ';'.join(junctionInfo2), ';'.join(offsetInfo2)]), file = hout)
      
     subprocess.check_call(["rm", "-rf", output_file + ".tmp3.junc1.gene.bed"])
     subprocess.check_call(["rm", "-rf", output_file + ".tmp3.junc2.gene.bed"])

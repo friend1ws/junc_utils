@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import sys, subprocess, pkg_resources
 import pysam
 import annot_utils.exon
@@ -39,7 +40,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
     exon_tb = pysam.TabixFile(output_file + ".tmp.refExon.bed.gz")
     if is_branchpoint:
         if genome_id != "hg19":
-            print >> sys.stderr, "branchpoint can be used only for hg19"
+            print("branchpoint can be used only for hg19", file = sys.stderr)
             sys.exit(1)
         if is_grc:
             branchpoint_bed = pkg_resources.resource_filename("annot_utils", "data/hg19/branchpoint_signal.grc.bed.gz")
@@ -56,7 +57,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
             header2ind[header[i]] = i
 
         # print header
-        print >> hout, '\t'.join(header) + '\t' + "Mutation_Key" + '\t' + "Motif_Pos" + '\t' + "Mutation_Type" + '\t' + "Is_Canonical"
+        print('\t'.join(header) + '\t' + "Mutation_Key" + '\t' + "Motif_Pos" + '\t' + "Mutation_Type" + '\t' + "Is_Canonical", file = hout)
 
         for line in hin:
             F = line.rstrip('\n').split('\t') 
@@ -164,8 +165,8 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                     try:
                         branche_lines = branch_tb.fetch(chr_name, firstSearchRegion[1], firstSearchRegion[2])
                     except Exception as inst:
-                        print >> sys.stderr, "%s: %s at the following key:" % (type(inst), inst.args)
-                        print >> sys.stderr, '\t'.join(F)
+                        print("%s: %s at the following key:" % (type(inst), inst.args), file = sys.stderr)
+                        print('\t'.join(F), file = sys.stderr)
                         tabixErrorFlag3 = 3
 
                     if tabixErrorFlag3 == 0:
@@ -254,7 +255,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
 
                     for item in RegMut:
                         mut_print_str = ','.join([mutation[i] for i in [0, 1, 3, 4]])
-                        print >> hout, '\t'.join(F) + '\t' + mut_print_str + '\t' + F[header2ind["SJ_1"]] + ':' + str(item[0][1]) + '-' + str(item[0][2]) + ',' + item[0][4] + '\t' + item[1] + '\t' + item[2]
+                        print('\t'.join(F) + '\t' + mut_print_str + '\t' + F[header2ind["SJ_1"]] + ':' + str(item[0][1]) + '-' + str(item[0][2]) + ',' + item[0][4] + '\t' + item[1] + '\t' + item[2], file = hout)
 
 
     hout.close()
@@ -288,7 +289,7 @@ def get_snv_junction_only_dist(input_file, output_file, mutation_file, annotatio
             header2ind[header[i]] = i
 
         # print header
-        print >> hout, '\t'.join(header) + '\t' + "Mutation_Key" + '\t' + "Motif_Pos" + '\t' + "Mutation_Type" + '\t' + "Is_Canonical"
+        print('\t'.join(header) + '\t' + "Mutation_Key" + '\t' + "Motif_Pos" + '\t' + "Mutation_Type" + '\t' + "Is_Canonical", file = hout)
 
         for line in hin:
             F = line.rstrip('\n').split('\t') 
@@ -318,7 +319,7 @@ def get_snv_junction_only_dist(input_file, output_file, mutation_file, annotatio
                 for mutation in mutations:
 
                     mut_print_str = ','.join([mutation[i] for i in [0, 1, 3, 4]])
-                    print >> hout, '\t'.join(F) + '\t' + mut_print_str + '\t' + "---,---" + '\t' + "---" + '\t' + "---"
+                    print('\t'.join(F) + '\t' + mut_print_str + '\t' + "---,---" + '\t' + "---" + '\t' + "---", file = hout)
 
 
     hout.close()
@@ -352,7 +353,7 @@ def get_sv_junction(input_file, output_file, sv_file, genome_id, is_grc):
             header2ind[header[i]] = i
 
         # print header
-        print >> hout, '\t'.join(header) + '\t' + "SV_Key" + '\t' + "SV_Type" + '\t' + "Dist_To_Junc1" + '\t' + "Dist_To_Junc2"
+        print('\t'.join(header) + '\t' + "SV_Key" + '\t' + "SV_Type" + '\t' + "Dist_To_Junc1" + '\t' + "Dist_To_Junc2", file = hout)
 
 
         for line in hin:
@@ -434,7 +435,7 @@ def get_sv_junction(input_file, output_file, sv_file, genome_id, is_grc):
 
                 sv_key = ','.join([SV_cur.chr1, str(SV_cur.pos1), SV_cur.dir1, SV_cur.chr2, str(SV_cur.pos2), SV_cur.dir2, SV_cur.inseq])
 
-                print >> hout, '\t'.join(F) + '\t' + sv_key + '\t' + SV_cur.sv_type + '\t' + str(junc_to_dist1) + '\t' + str(junc_to_dist2)
+                print('\t'.join(F) + '\t' + sv_key + '\t' + SV_cur.sv_type + '\t' + str(junc_to_dist1) + '\t' + str(junc_to_dist2), file = hout)
 
     hout.close()
 

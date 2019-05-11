@@ -1,5 +1,6 @@
 #! /usr/bin/env python
 
+from __future__ import print_function
 import os, subprocess
 import utils
 from logger import get_logger
@@ -53,7 +54,7 @@ def associate_main(args):
 
 
     if not is_sv and is_anno and reference_genome is None:
-        print >> sys.stderr, "When the mutation file format is annovar format, reference genome should be specified"
+        print("When the mutation file format is annovar format, reference genome should be specified", file = sys.stderr)
         sys.exit(1)
 
     output_dir = os.path.dirname(output_file)
@@ -76,17 +77,17 @@ def associate_main(args):
         hout.close()
 
         if s_ret != 0:
-            print >> sys.stderr, "Error in sorting vcf file"
+            print("Error in sorting vcf file", file = sys.stderr)
             sys.exit(1)
 
         s_ret = subprocess.call(["bgzip", "-f", output_file + ".mutran_tmp.vcf"])
         if s_ret != 0:
-            print >> sys.stderr, "Error in bgzip compression"
+            print("Error in bgzip compression", file = sys.stderr)
             sys.exit(1)
 
         s_ret = subprocess.call(["tabix", "-p", "vcf", output_file + ".mutran_tmp.vcf.gz"])
         if s_ret != 0:
-            print >> sys.stderr, "Error in tabix indexing"
+            print("Error in tabix indexing", file = sys.stderr)
             sys.exit(1)
 
     else:
@@ -98,18 +99,18 @@ def associate_main(args):
         hout.close()
         
         if s_ret != 0:
-            print >> sys.stderr, "Error in sorting bedpe file"
+            print("Error in sorting bedpe file", file = sys.stderr)
             sys.exit(1)
     
         s_ret = subprocess.call(["bgzip", "-f", output_file + ".mutran_tmp.bedpe"])
         if s_ret != 0:
-            print >> sys.stderr, "Error in bgzip compression"
+            print("Error in bgzip compression", file = sys.stderr)
             sys.exit(1)
     
         
         s_ret = subprocess.call(["tabix", "-p", "bed", output_file + ".mutran_tmp.bedpe.gz"])
         if s_ret != 0:
-            print >> sys.stderr, "Error in tabix indexing"
+            print("Error in tabix indexing", file = sys.stderr)
             sys.exit(1)
 
     ##########
@@ -192,7 +193,7 @@ def merge_control_main(args):
                     # F[1] = str(int(F[1]) - 1)
                     # F[2] = str(int(F[2]) + 1)
          
-                    print >> hout, '\t'.join(F)
+                    print('\t'.join(F), file = hout)
                 
 
     hout = open(output_file + ".sorted", 'w')
@@ -200,7 +201,7 @@ def merge_control_main(args):
     hout.close()
 
     if s_ret != 0:
-        print >> sys.stderr, "Error in sorting merged junction file"
+        print("Error in sorting merged junction file", file = sys.stderr)
         sys.exit(1)
 
 
@@ -215,7 +216,7 @@ def merge_control_main(args):
             if key != temp_key:
                 if temp_key != "":
                     if len(temp_read_num) >= sample_num_thres:
-                        print >> hout, temp_key + '\t' + ','.join([str(x) for x in sorted(temp_read_num)])
+                        print(temp_key + '\t' + ','.join([str(x) for x in sorted(temp_read_num)]), file = hout)
                 temp_key = key
                 temp_read_num = []
 
@@ -223,7 +224,7 @@ def merge_control_main(args):
 
         if temp_key != "":
             if len(temp_read_num) >= sample_num_thres:
-                print >> hout, temp_key + '\t' + ','.join([str(x) for x in sorted(temp_read_num)])
+                print(temp_key + '\t' + ','.join([str(x) for x in sorted(temp_read_num)]), file = hout)
 
 
 
@@ -232,13 +233,13 @@ def merge_control_main(args):
     hout.close()
 
     if s_ret != 0:
-        print >> sys.stderr, "Error in compression merged junction file"
+        print("Error in compression merged junction file", file = sys.stderr)
         sys.exit(1)
 
 
     s_ret = subprocess.call(["tabix", "-p", "bed", output_file])
     if s_ret != 0:
-        print >> sys.stderr, "Error in indexing merged junction file"
+        print("Error in indexing merged junction file", file = sys.stderr)
         sys.exit(1)
 
     subprocess.call(["rm", "-f", output_file + ".unsorted"])
