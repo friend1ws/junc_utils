@@ -51,6 +51,7 @@ def convert_anno2vcf(input_file, output_file, reference, header = False):
             seq = seq.replace(F[0] + ":" + str(F[1]) + "-" + str(F[1]), '')
             ref, alt = seq, seq + F[4]
 
+
         # deletion
         if F[4] == "-":
             # get the sequence for the reference base

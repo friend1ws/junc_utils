@@ -1,7 +1,7 @@
 #! /usr/bin/env python
 
 from __future__ import print_function
-import os, subprocess
+import sys, os, subprocess
 from . import utils
 from .logger import get_logger
 logger = get_logger(__name__)
@@ -73,7 +73,7 @@ def associate_main(args):
             utils.remove_vcf_header(mutation_file, output_file + ".mutran_tmp.unsorted.vcf")
 
         hout = open(output_file + ".mutran_tmp.vcf", 'w')
-        s_ret = subprocess.call(["sort", "-k1,1", "-k2,2n", output_file + ".mutran_tmp.unsorted.vcf"], stdout = hout)
+        s_ret = subprocess.call(["sort", "-f",  "-k1,1", "-k2,2n", output_file + ".mutran_tmp.unsorted.vcf"], stdout = hout)
         hout.close()
 
         if s_ret != 0:
@@ -95,7 +95,7 @@ def associate_main(args):
         utils.convert_genosv2bed(mutation_file, output_file + ".mutran_tmp.unsorted.bedpe")
 
         hout = open(output_file + ".mutran_tmp.bedpe", 'w') 
-        s_ret = subprocess.call(["sort", "-k1,1", "-k2,2n", "-k3,3n", "-k4,4", "-k5,5n", "-k6,6n", output_file + ".mutran_tmp.unsorted.bedpe"], stdout = hout)
+        s_ret = subprocess.call(["sort", "-f", "-k1,1", "-k2,2n", "-k3,3n", "-k4,4", "-k5,5n", "-k6,6n", output_file + ".mutran_tmp.unsorted.bedpe"], stdout = hout)
         hout.close()
         
         if s_ret != 0:
@@ -174,9 +174,8 @@ def merge_control_main(args):
     if os.path.dirname(output_file) != "" and not os.path.exists(os.path.dirname(output_file)):
         os.makedirs(os.path.dirname(output_file))
 
-    hin = open(input_file_list, 'r')
+    # hin = open(input_file_list, 'r')
     hout = open(output_file + ".unsorted", 'w')
-
     with open(input_file_list, 'r') as hin:
         for line in hin:
 
@@ -194,10 +193,12 @@ def merge_control_main(args):
                     # F[2] = str(int(F[2]) + 1)
          
                     print('\t'.join(F), file = hout)
-                
+
+    hout.close()                
+
 
     hout = open(output_file + ".sorted", 'w')
-    s_ret = subprocess.call(["sort", "-k1,1", "-k2,2n", "-k3,3n", output_file + ".unsorted"], stdout = hout)
+    s_ret = subprocess.call(["sort", "-f", "-k1,1", "-k2,2n", "-k3,3n", output_file + ".unsorted"], stdout = hout)
     hout.close()
 
     if s_ret != 0:
@@ -226,6 +227,7 @@ def merge_control_main(args):
             if len(temp_read_num) >= sample_num_thres:
                 print(temp_key + '\t' + ','.join([str(x) for x in sorted(temp_read_num)]), file = hout)
 
+    hout.close()
 
 
     hout = open(output_file, 'w')

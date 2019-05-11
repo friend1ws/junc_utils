@@ -4,7 +4,7 @@ from __future__ import print_function
 import unittest
 import os, glob, tempfile, shutil, filecmp
 import junc_utils
-from check_download import *
+# from .check_download import *
 
 class TestMergeControl(unittest.TestCase):
 
@@ -31,12 +31,12 @@ class TestMergeControl(unittest.TestCase):
         input_list_file = tmp_dir + "/CCLE.SJ_out_tab.list.txt"
         output_file = tmp_dir + "/merge_control.bed.gz"
         answer_file = cur_dir + "/data/merge_control/merge_control.bed.gz"
- 
+
         args = self.parser.parse_args(["merge_control", input_list_file, output_file])
         args.func(args)
 
         self.assertTrue(filecmp.cmp(output_file, answer_file, shallow=False))
-
+        
         shutil.rmtree(tmp_dir)
 
 if __name__ == "__main__":
