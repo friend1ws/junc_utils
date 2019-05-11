@@ -3,7 +3,13 @@
 from __future__ import print_function
 import pysam 
 import sys, subprocess
-from itertools import izip
+
+# for python2 and 3 compatibility
+try:
+    import itertools.izip as zip
+except ImportError:
+    pass
+
 import annot_utils.gene, annot_utils.exon, annot_utils.coding
 
 
@@ -184,7 +190,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
     # for creating splicing junction to in-frame information table
     with open(output_file + ".tmp3.junc1.gene.bed") as hin_g1, open(output_file + ".tmp3.junc2.gene.bed") as hin_g2, \
       open(output_file + ".tmp3.junc12.gene.bed", 'w') as hout:
-        for line_g1, line_g2 in izip(hin_g1, hin_g2):
+        for line_g1, line_g2 in zip(hin_g1, hin_g2):
             F_g1 = line_g1.rstrip('\n').split('\t')
             F_g2 = line_g2.rstrip('\n').split('\t')
 
@@ -268,7 +274,7 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
       open(output_file + ".tmp3.junc1.exon.bed", 'r') as hin_e1, open(output_file + ".tmp3.junc2.exon.bed", 'r') as hin_e2, \
       open(output_file + ".tmp3.junc12.coding_size.bed") as hin_c, open(output_file, 'a') as hout:
 
-        for line, line_g1, line_g2, line_e1, line_e2, line_c in izip(hin, hin_g1, hin_g2, hin_e1, hin_e2, hin_c):
+        for line, line_g1, line_g2, line_e1, line_e2, line_c in zip(hin, hin_g1, hin_g2, hin_e1, hin_e2, hin_c):
 
             F = line.rstrip('\n').split('\t')
             F_g1, F_g2, F_e1, F_e2, F_c = line_g1.rstrip('\n').split('\t'), line_g2.rstrip('\n').split('\t'), \

@@ -1,10 +1,13 @@
-#! /usr/bin/env python
+#! /usr/bin/env python3
 
-from parser import create_parser
+# from parser import create_parser
+# from . import parser.create_parser
+# import parser as ppp
+from . import parser
 
 def main():
 
-    parser = create_parser()
-    args = parser.parse_args()
+    cparser = parser.create_parser()
+    args = cparser.parse_args()
     args.func(args)
 

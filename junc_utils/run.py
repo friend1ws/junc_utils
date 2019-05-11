@@ -2,8 +2,8 @@
 
 from __future__ import print_function
 import os, subprocess
-import utils
-from logger import get_logger
+from . import utils
+from .logger import get_logger
 logger = get_logger(__name__)
 
 
@@ -15,7 +15,7 @@ def filter_main(args):
 
 def annotate_main(args):
    
-    import annotate
+    from . import annotate
     from annot_utils.utils import grc_check
     
     if args.grc == True:
@@ -28,7 +28,7 @@ def annotate_main(args):
 
 def associate_main(args):
 
-    import associate
+    from . import associate
     from annot_utils.utils import grc_check
 
     mutation_file = args.mutation_file
