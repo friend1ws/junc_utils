@@ -12,7 +12,7 @@ before_script:
   - cd bedtools2 && make && export PATH=$PATH:$PWD/bin && cd ..
   - pip install annot_utils==0.3.0b3
   - pip install pysam
-
+  - pip install requests
 script:
   - pip install .
   - python setup.py test
