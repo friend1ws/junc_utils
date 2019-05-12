@@ -72,6 +72,10 @@ def convert_anno2vcf(input_file, output_file, reference, header = False):
                 + "\t" + str(QUAL) + "\t" + "PASS" + "\t" + INFO, file = hout)
 
 
+    hin.close()
+    hout.close()
+
+
 def remove_vcf_header(input_file, output_file):
 
     hout = open(output_file, 'w')

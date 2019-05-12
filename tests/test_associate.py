@@ -3,7 +3,7 @@
 import unittest
 import os, tempfile, shutil, filecmp
 import junc_utils
-from check_download import *
+from .check_download import *
 
 class TestAssociate(unittest.TestCase):
 

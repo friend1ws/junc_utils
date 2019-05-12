@@ -253,7 +253,7 @@ def get_snv_junction2(input_file, output_file, mutation_file, donor_size, accept
                             if reg[5] == 0: RegMut.append([reg, reg[3] + " creation", is_canonical])
                             if reg[5] == 1: RegMut.append([reg, reg[3] + " disruption", is_canonical])
 
-                    for item in RegMut:
+                    for item in sorted(RegMut):
                         mut_print_str = ','.join([mutation[i] for i in [0, 1, 3, 4]])
                         print('\t'.join(F) + '\t' + mut_print_str + '\t' + F[header2ind["SJ_1"]] + ':' + str(item[0][1]) + '-' + str(item[0][2]) + ',' + item[0][4] + '\t' + item[1] + '\t' + item[2], file = hout)
 
