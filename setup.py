@@ -22,6 +22,8 @@ setup(
     name = 'junc_utils',
     version = get_version(),
     description='Python programs for analyzing splicing junctions',
+    long_description=long_description, 
+    long_description_content_type='text/markdown',
     url = 'https://github.com/friend1ws/junc_utils',
     author = 'Yuichi Shiraishi',
     author_email = 'friend1ws@gamil.com',

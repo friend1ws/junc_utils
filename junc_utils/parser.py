@@ -1,6 +1,5 @@
-#! /usr/bin/env python3
+#! /usr/bin/env python
 
-# from . import run
 from .run import *
 import argparse
 from .version import __version__
