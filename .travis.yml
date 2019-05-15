@@ -15,5 +15,8 @@ before_script:
   - pip install requests
 script:
   - pip install .
+  - junc_utils
+  - junc_utils -h
+  - junc_utils --version
   - python setup.py test
 

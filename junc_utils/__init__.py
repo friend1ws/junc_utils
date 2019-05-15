@@ -8,7 +8,7 @@ def main():
     args = cparser.parse_args()
 
     if vars(args) == {}:
-        parser.print_usage()
+        cparser.print_usage()
     else:
         args.func(args)
 
