@@ -41,7 +41,7 @@ setup(
     ],
 
     packages = find_packages(exclude = ['tests']),
-    install_requires = [],
+    install_requires = ["annot_utils>=0.3.0", "pysam>=0.9.0"],
 
     entry_points = {'console_scripts': ['junc_utils = junc_utils:main']}
 
