@@ -23,7 +23,8 @@ def annotate_main(args):
 
     is_grc = grc_check(args.junc_file, [0])
  
-    annotate.annot_junction(args.junc_file, args.output_path, args.junction_margin, args.exon_margin, args.genome_id, is_grc)
+    annotate.annot_junction(args.junc_file, args.output_path, args.junction_margin, args.exon_margin, 
+                            args.gene_model, args.genome_id, is_grc)
 
 
 def associate_main(args):

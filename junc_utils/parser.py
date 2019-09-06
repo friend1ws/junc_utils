@@ -53,6 +53,9 @@ def create_parser():
     # annotate.add_argument("annotation_dir", metavar = "annotation_dir", default = None, type = str,
     #                       help = "the path to the database directory")
 
+    annotate.add_argument("--gene_model", choices = ["refseq", "gencode"], default = "refseq",
+                       help = "gene model (refGene or ensGene) (default: %(default)s)")
+
     annotate.add_argument("--grc", default = False, action = 'store_true',
                           help = "Deprecated. This is not used any more. Convert chromosome names to Genome Reference Consortium nomenclature (default: %(default)s)")
 

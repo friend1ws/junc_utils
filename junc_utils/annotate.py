@@ -13,7 +13,7 @@ except ImportError:
 import annot_utils.gene, annot_utils.exon, annot_utils.coding
 
 
-def annot_junction(input_file, output_file, junction_margin, exon_margin, genome_id = "hg19", is_grc = True):
+def annot_junction(input_file, output_file, junction_margin, exon_margin, gene_model = "refseq", genome_id = "hg19", is_grc = True):
     """
         The purpose of this script is to classify splicing changes
         mainly by comparing the two breakpoints with the exon-intorn junction of genes
@@ -47,9 +47,9 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, genome
 
     """
 
-    annot_utils.gene.make_gene_info(output_file + ".tmp.refGene.bed.gz", "refseq", genome_id, is_grc, True)
-    annot_utils.exon.make_exon_info(output_file + ".tmp.refExon.bed.gz", "refseq", genome_id, is_grc, True)
-    annot_utils.coding.make_coding_info(output_file + ".tmp.refCoding.bed.gz", "refseq", genome_id, is_grc, True)
+    annot_utils.gene.make_gene_info(output_file + ".tmp.refGene.bed.gz", gene_model, genome_id, is_grc, True)
+    annot_utils.exon.make_exon_info(output_file + ".tmp.refExon.bed.gz", gene_model, genome_id, is_grc, True)
+    annot_utils.coding.make_coding_info(output_file + ".tmp.refCoding.bed.gz", gene_model, genome_id, is_grc, True)
   
     with open(output_file + ".tmp1.junc1.gene.bed", 'w') as hout_g1, open(output_file + ".tmp1.junc2.gene.bed", 'w') as hout_g2, \
       open(output_file + ".tmp1.junc1.exon.bed", 'w') as hout_e1, open(output_file + ".tmp1.junc2.exon.bed", 'w') as hout_e2:
