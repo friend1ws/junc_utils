@@ -119,7 +119,7 @@ def proc_star_junction(input_file, output_file, control_file, read_num_thres, ov
     
     control_db = {}
     if is_control:
-        with gzip.open(control_file, 'r') as hin:
+        with gzip.open(control_file, 'rt') as hin:
             for line in hin:
                 F = line.rstrip('\n').split('\t')
                 key = F[0] + '\t' + F[1] + '\t' + F[2]
