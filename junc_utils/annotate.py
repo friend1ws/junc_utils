@@ -59,11 +59,16 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, gene_m
                 chr_name, sj_start, sj_end = F[0], int(F[1]) - 1, int(F[2]) + 1
                 sj_id = ','.join([F[0], F[1], F[2]])
 
+                print(f'{chr_name}\t{max(0, sj_start - 1)}\t{sj_start}\t{sj_id}', file = hout_g1)
+                print(f'{chr_name}\t{max(0, sj_end - 1)}\t{sj_end}\t{sj_id}', file = hout_g2)
+                print(f'{chr_name}\t{max(0, sj_start - exon_margin - 1)}\t{sj_start + exon_margin}\t{sj_id}', file = hout_e1)
+                print(f'{chr_name}\t{max(0, sj_end - exon_margin - 1)}\t{sj_end + exon_margin}\t{sj_id}', file = hout_e2) 
+                """
                 print(chr_name + '\t' + str(sj_start - 1) + '\t' + str(sj_start) + '\t' + sj_id, file = hout_g1)
                 print(chr_name + '\t' + str(sj_end - 1) + '\t' + str(sj_end) + '\t' + sj_id, file = hout_g2)
                 print(chr_name + '\t' + str(sj_start - exon_margin - 1) + '\t' + str(sj_start + exon_margin) + '\t' + sj_id, file = hout_e1)
                 print(chr_name + '\t' + str(sj_end - exon_margin - 1) + '\t' + str(sj_end + exon_margin) + '\t' + sj_id, file = hout_e2)
-
+                """
 
     with open(output_file + ".tmp2.junc1.gene.bed", 'w') as hout_g1:
         subprocess.check_call(["bedtools", "intersect", "-a", output_file + ".tmp1.junc1.gene.bed", "-b", output_file + ".tmp.refGene.bed.gz", "-loj"], stdout = hout_g1)
@@ -209,8 +214,11 @@ def annot_junction(input_file, output_file, junction_margin, exon_margin, gene_m
             common_gene_list = list(set(gene1) & set(gene2))
             common_gene = ','.join(common_gene_list) if len(common_gene_list) > 0 else "---"
 
-            print(chr_name + '\t' + str(sj_start - exon_margin - 1) + '\t' + str(sj_end + exon_margin) + '\t' + F_g1[0] + '\t' + common_gene, file = hout)
+            print(f'{chr_name}\t{max(0, sj_start - exon_margin - 1)}\t{sj_end + exon_margin}\t{F_g1[0]}\t{common_gene}', file = hout)
 
+            """
+            print(chr_name + '\t' + str(sj_start - exon_margin - 1) + '\t' + str(sj_end + exon_margin) + '\t' + F_g1[0] + '\t' + common_gene, file = hout)
+            """
 
     with open(output_file + ".tmp3.junc12.gene.coding.bed", 'w') as hout:
         subprocess.check_call(["bedtools", "intersect", "-a", output_file + ".tmp3.junc12.gene.bed", "-b", output_file + ".tmp.refCoding.bed.gz", "-loj"], stdout = hout)
