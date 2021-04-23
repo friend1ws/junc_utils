@@ -27,7 +27,7 @@ cd junc_utils-0.5.0
 python setup.py build install
 ```
 
-This package has been tested on Python 2.7, 3.5, 3.6.
+This package has been tested on Python 3.6, 3.7, 3.8, 3.9
 
 ## Commands
 
